@@ -1,0 +1,26 @@
+diff -up Linux-PAM-1.1.0/modules/pam_console/console.handlers.nochmod Linux-PAM-1.1.0/modules/pam_console/console.handlers
+--- Linux-PAM-1.1.0/modules/pam_console/console.handlers.nochmod	2008-12-16 13:37:52.000000000 +0100
++++ Linux-PAM-1.1.0/modules/pam_console/console.handlers	2009-09-01 17:20:08.000000000 +0200
+@@ -15,5 +15,3 @@
+ # touch unlock wait /var/run/console-unlocked
+ 
+ console consoledevs tty[0-9][0-9]* vc/[0-9][0-9]* :[0-9]+\.[0-9]+ :[0-9]+
+-/sbin/pam_console_apply lock logfail wait -t tty -s
+-/sbin/pam_console_apply unlock logfail wait -r -t tty -s
+diff -up Linux-PAM-1.1.0/modules/pam_console/Makefile.am.nochmod Linux-PAM-1.1.0/modules/pam_console/Makefile.am
+--- Linux-PAM-1.1.0/modules/pam_console/Makefile.am.nochmod	2008-12-16 13:37:52.000000000 +0100
++++ Linux-PAM-1.1.0/modules/pam_console/Makefile.am	2009-09-01 17:42:47.000000000 +0200
+@@ -38,7 +38,6 @@ sbin_PROGRAMS = pam_console_apply
+ 
+ 
+ secureconf_DATA = console.perms console.handlers
+-permsd_DATA = 50-default.perms
+ 
+ FLEX_OPTS = -Cr
+ BISON_OPTS = -d
+@@ -62,4 +61,5 @@ configfile.c: configfile.tab.c configfil
+ 
+ install-data-local:
+ 	mkdir -p $(DESTDIR)$(secureconfdir)/console.apps
++	mkdir -p $(DESTDIR)$(permsddir)
+ 	mkdir -m $(LOCKMODE) -p -p $(DESTDIR)$(LOCKDIR)

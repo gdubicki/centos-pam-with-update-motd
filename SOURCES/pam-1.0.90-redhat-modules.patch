@@ -1,0 +1,23 @@
+diff -up Linux-PAM-1.0.90/modules/Makefile.am.redhat-modules Linux-PAM-1.0.90/modules/Makefile.am
+--- Linux-PAM-1.0.90/modules/Makefile.am.redhat-modules	2008-11-29 08:27:35.000000000 +0100
++++ Linux-PAM-1.0.90/modules/Makefile.am	2008-12-16 13:40:16.000000000 +0100
+@@ -3,6 +3,7 @@
+ #
+ 
+ SUBDIRS = pam_access pam_cracklib pam_debug pam_deny pam_echo \
++	pam_chroot pam_console pam_postgresok \
+ 	pam_env pam_exec pam_faildelay pam_filter pam_ftp \
+ 	pam_group pam_issue pam_keyinit pam_lastlog pam_limits \
+ 	pam_listfile pam_localuser pam_loginuid pam_mail \
+diff -up Linux-PAM-1.0.90/configure.in.redhat-modules Linux-PAM-1.0.90/configure.in
+--- Linux-PAM-1.0.90/configure.in.redhat-modules	2008-12-02 16:25:01.000000000 +0100
++++ Linux-PAM-1.0.90/configure.in	2008-12-16 13:39:11.000000000 +0100
+@@ -531,6 +531,8 @@ AC_CONFIG_FILES([Makefile libpam/Makefil
+ 	libpam_misc/Makefile conf/Makefile conf/pam_conv1/Makefile \
+ 	po/Makefile.in \
+ 	modules/Makefile \
++	modules/pam_chroot/Makefile modules/pam_console/Makefile \
++	modules/pam_postgresok/Makefile \
+ 	modules/pam_access/Makefile modules/pam_cracklib/Makefile \
+         modules/pam_debug/Makefile modules/pam_deny/Makefile \
+ 	modules/pam_echo/Makefile modules/pam_env/Makefile \
