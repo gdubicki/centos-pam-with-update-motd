@@ -1,9 +1,9 @@
-%define pam_redhat_version 0.99.10-1
+%define pam_redhat_version 0.99.11
 
 Summary: An extensible library which provides authentication for applications
 Name: pam
 Version: 1.1.8
-Release: 1%{?dist}
+Release: 9%{?dist}
 # The library is BSD licensed with option to relicense as GPLv2+
 # - this option is redundant as the BSD license allows that anyway.
 # pam_timestamp, pam_loginuid, and pam_console modules are GPLv2+.
@@ -23,7 +23,7 @@ Source10: config-util.pamd
 Source11: dlopen.sh
 Source12: system-auth.5
 Source13: config-util.5
-Source14: 90-nproc.conf
+Source14: 20-nproc.conf
 Source15: pamtmp.conf
 Source16: postlogin.pamd
 Source17: postlogin.5
@@ -31,20 +31,22 @@ Patch1:  pam-1.0.90-redhat-modules.patch
 Patch2:  pam-1.1.6-std-noclose.patch
 Patch4:  pam-1.1.0-console-nochmod.patch
 Patch5:  pam-1.1.0-notally.patch
-Patch7:  pam-1.1.0-console-fixes.patch
 Patch8:  pam-1.1.1-faillock.patch
 Patch9:  pam-1.1.6-noflex.patch
 Patch10: pam-1.1.3-nouserenv.patch
-Patch11: pam-1.1.3-console-abstract.patch
 Patch12: pam-1.1.3-faillock-screensaver.patch
 Patch13: pam-1.1.6-limits-user.patch
 Patch15: pam-1.1.6-full-relro.patch
 # FIPS related - non upstreamable
 Patch20: pam-1.1.5-unix-no-fallback.patch
 # Upstreamed partially
-Patch29: pam-1.1.6-pwhistory-helper.patch
+Patch29: pam-1.1.8-pwhistory-helper.patch
 Patch31: pam-1.1.6-use-links.patch
 Patch32: pam-1.1.7-tty-audit-init.patch
+Patch33: pam-1.1.8-translation-updates.patch
+Patch34: pam-1.1.8-canonicalize-username.patch
+Patch35: pam-1.1.8-cve-2013-7041.patch
+Patch36: pam-1.1.8-cve-2014-2583.patch
 
 %define _pamlibdir %{_libdir}
 %define _moduledir %{_libdir}/security
@@ -57,6 +59,7 @@ Patch32: pam-1.1.7-tty-audit-init.patch
 %if %{?WITH_AUDIT:0}%{!?WITH_AUDIT:1}
 %define WITH_AUDIT 1
 %endif
+%global _performance_build 1
 
 Requires: cracklib-dicts >= 2.8
 Requires: libpwquality >= 0.9.9
@@ -110,11 +113,9 @@ mv pam-redhat-%{pam_redhat_version}/* modules
 %patch2 -p1 -b .std-noclose
 %patch4 -p1 -b .nochmod
 %patch5 -p1 -b .notally
-%patch7 -p1 -b .console-fixes
 %patch8 -p1 -b .faillock
 %patch9 -p1 -b .noflex
 %patch10 -p1 -b .nouserenv
-%patch11 -p1 -b .abstract
 %patch12 -p1 -b .screensaver
 %patch13 -p1 -b .limits
 %patch15 -p1 -b .relro
@@ -122,6 +123,10 @@ mv pam-redhat-%{pam_redhat_version}/* modules
 %patch29 -p1 -b .pwhhelper
 %patch31 -p1 -b .links
 %patch32 -p1 -b .tty-audit-init
+%patch33 -p2 -b .translations
+%patch34 -p1 -b .canonicalize
+%patch35 -p1 -b .case
+%patch36 -p1 -b .timestamp-ruser
 
 %build
 autoreconf -i
@@ -136,6 +141,7 @@ autoreconf -i
 %endif
 	--disable-static \
 	--disable-prelude
+make -C po update-gmo
 make
 # we do not use _smp_mflags because the build of sources in yacc/flex fails
 
@@ -167,7 +173,7 @@ install -m 644 %{SOURCE8} $RPM_BUILD_ROOT%{_pamconfdir}/fingerprint-auth
 install -m 644 %{SOURCE9} $RPM_BUILD_ROOT%{_pamconfdir}/smartcard-auth
 install -m 644 %{SOURCE10} $RPM_BUILD_ROOT%{_pamconfdir}/config-util
 install -m 644 %{SOURCE16} $RPM_BUILD_ROOT%{_pamconfdir}/postlogin
-install -m 644 %{SOURCE14} $RPM_BUILD_ROOT%{_secconfdir}/limits.d/90-nproc.conf
+install -m 644 %{SOURCE14} $RPM_BUILD_ROOT%{_secconfdir}/limits.d/20-nproc.conf
 install -m 600 /dev/null $RPM_BUILD_ROOT%{_secconfdir}/opasswd
 install -d -m 755 $RPM_BUILD_ROOT/var/log
 install -m 600 /dev/null $RPM_BUILD_ROOT/var/log/tallylog
@@ -338,7 +344,7 @@ fi
 %config(noreplace) %{_secconfdir}/group.conf
 %config(noreplace) %{_secconfdir}/limits.conf
 %dir %{_secconfdir}/limits.d
-%config(noreplace) %{_secconfdir}/limits.d/90-nproc.conf
+%config(noreplace) %{_secconfdir}/limits.d/20-nproc.conf
 %config(noreplace) %{_secconfdir}/namespace.conf
 %dir %{_secconfdir}/namespace.d
 %attr(755,root,root) %config(noreplace) %{_secconfdir}/namespace.init
@@ -369,6 +375,32 @@ fi
 %doc doc/adg/*.txt doc/adg/html
 
 %changelog
+* Mon Mar 31 2014 Tomáš Mráz <tmraz@redhat.com> 1.1.8-9
+- fix CVE-2014-2583: potential path traversal issue in pam_timestamp
+- pam_pwhistory: call the helper if SELinux enabled
+
+* Tue Mar 11 2014 Tomáš Mráz <tmraz@redhat.com> 1.1.8-8
+- fix CVE-2013-7041: use case sensitive comparison in pam_userdb
+
+* Mon Mar 10 2014 Tomáš Mráz <tmraz@redhat.com> 1.1.8-7
+- rename the 90-nproc.conf to 20-nproc.conf (#1071618)
+- canonicalize user name in pam_selinux (#1071010)
+
+* Fri Jan 31 2014 Tomáš Mráz <tmraz@redhat.com> 1.1.8-6
+- refresh the pam-redhat tarball
+
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.1.8-5
+- Mass rebuild 2014-01-24
+
+* Wed Jan 15 2014 Tomáš Mráz <tmraz@redhat.com> 1.1.8-4
+- rebuild with -O3 on ppc64 architecture
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.1.8-3
+- Mass rebuild 2013-12-27
+
+* Tue Dec  3 2013 Tomáš Mráz <tmraz@redhat.com> 1.1.8-2
+- updated translations
+
 * Mon Oct 14 2013 Tomáš Mráz <tmraz@redhat.com> 1.1.8-1
 - new upstream release
 

@@ -1,5 +1,5 @@
 diff --git a/modules/pam_pwhistory/Makefile.am b/modules/pam_pwhistory/Makefile.am
-index 4bb4d6d..0d7cbea 100644
+index 4bb4d6d..9157b91 100644
 --- a/modules/pam_pwhistory/Makefile.am
 +++ b/modules/pam_pwhistory/Makefile.am
 @@ -1,5 +1,6 @@
@@ -36,8 +36,9 @@ index 4bb4d6d..0d7cbea 100644
  noinst_HEADERS = opasswd.h
  
  securelib_LTLIBRARIES = pam_pwhistory.la
+-pam_pwhistory_la_LIBADD = $(top_builddir)/libpam/libpam.la @LIBCRYPT@
 +pam_pwhistory_la_CFLAGS = $(AM_CFLAGS)
- pam_pwhistory_la_LIBADD = $(top_builddir)/libpam/libpam.la @LIBCRYPT@
++pam_pwhistory_la_LIBADD = $(top_builddir)/libpam/libpam.la @LIBCRYPT@ @LIBSELINUX@
  pam_pwhistory_la_SOURCES = pam_pwhistory.c opasswd.c
  
 +sbin_PROGRAMS = pwhistory_helper
@@ -49,10 +50,17 @@ index 4bb4d6d..0d7cbea 100644
  noinst_DATA = README
  README: pam_pwhistory.8.xml
 diff --git a/modules/pam_pwhistory/opasswd.c b/modules/pam_pwhistory/opasswd.c
-index 836d713..f1112ac 100644
+index 836d713..e319ff3 100644
 --- a/modules/pam_pwhistory/opasswd.c
 +++ b/modules/pam_pwhistory/opasswd.c
-@@ -38,6 +38,7 @@
+@@ -1,5 +1,6 @@
+ /*
+  * Copyright (c) 2008 Thorsten Kukuk <kukuk@suse.de>
++ * Copyright (c) 2013 Red Hat, Inc.
+  *
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions
+@@ -38,6 +39,7 @@
  #endif
  
  #include <pwd.h>
@@ -60,7 +68,7 @@ index 836d713..f1112ac 100644
  #include <time.h>
  #include <ctype.h>
  #include <errno.h>
-@@ -47,6 +48,7 @@
+@@ -47,6 +49,7 @@
  #include <string.h>
  #include <stdlib.h>
  #include <syslog.h>
@@ -68,7 +76,7 @@ index 836d713..f1112ac 100644
  #include <sys/stat.h>
  
  #if defined (HAVE_XCRYPT_H)
-@@ -55,7 +57,14 @@
+@@ -55,7 +58,14 @@
  #include <crypt.h>
  #endif
  
@@ -83,7 +91,7 @@ index 836d713..f1112ac 100644
  #include <security/pam_modules.h>
  
  #include "opasswd.h"
-@@ -76,6 +85,19 @@ typedef struct {
+@@ -76,6 +86,19 @@ typedef struct {
    char *old_passwords;
  } opwd;
  
@@ -103,7 +111,7 @@ index 836d713..f1112ac 100644
  
  static int
  parse_entry (char *line, opwd *data)
-@@ -112,8 +134,8 @@ compare_password(const char *newpass, const char *oldpass)
+@@ -112,8 +135,8 @@ compare_password(const char *newpass, const char *oldpass)
  }
  
  /* Check, if the new password is already in the opasswd file.  */
@@ -114,7 +122,19 @@ index 836d713..f1112ac 100644
  		const char *newpass, int debug)
  {
    int retval = PAM_SUCCESS;
-@@ -208,9 +230,9 @@ check_old_pass (pam_handle_t *pamh, const char *user,
+@@ -123,6 +146,11 @@ check_old_pass (pam_handle_t *pamh, const char *user,
+   opwd entry;
+   int found = 0;
+ 
++#ifndef HELPER_COMPILE
++  if (SELINUX_ENABLED)
++    return PAM_PWHISTORY_RUN_HELPER;
++#endif
++
+   if ((oldpf = fopen (OLD_PASSWORDS_FILE, "r")) == NULL)
+     {
+       if (errno != ENOENT)
+@@ -208,9 +236,9 @@ check_old_pass (pam_handle_t *pamh, const char *user,
    return retval;
  }
  
@@ -127,7 +147,7 @@ index 836d713..f1112ac 100644
  {
    char opasswd_tmp[] = TMP_PASSWORDS_FILE;
    struct stat opasswd_stat;
-@@ -221,10 +243,30 @@ save_old_pass (pam_handle_t *pamh, const char *user, uid_t uid,
+@@ -221,10 +249,35 @@ save_old_pass (pam_handle_t *pamh, const char *user, uid_t uid,
    char *buf = NULL;
    size_t buflen = 0;
    int found = 0;
@@ -141,6 +161,11 @@ index 836d713..f1112ac 100644
    if (howmany <= 0)
      return PAM_SUCCESS;
  
++#ifndef HELPER_COMPILE
++  if (SELINUX_ENABLED)
++    return PAM_PWHISTORY_RUN_HELPER;
++#endif
++
 +  if ((strcmp(pwd->pw_passwd, "x") == 0)  ||
 +      ((pwd->pw_passwd[0] == '#') &&
 +       (pwd->pw_passwd[1] == '#') &&
@@ -158,7 +183,7 @@ index 836d713..f1112ac 100644
    if (oldpass == NULL || *oldpass == '\0')
      return PAM_SUCCESS;
  
-@@ -447,7 +489,7 @@ save_old_pass (pam_handle_t *pamh, const char *user, uid_t uid,
+@@ -447,7 +500,7 @@ save_old_pass (pam_handle_t *pamh, const char *user, uid_t uid,
      {
        char *out;
  
@@ -168,10 +193,17 @@ index 836d713..f1112ac 100644
  	  retval = PAM_AUTHTOK_ERR;
  	  if (oldpf)
 diff --git a/modules/pam_pwhistory/opasswd.h b/modules/pam_pwhistory/opasswd.h
-index db3e656..21430be 100644
+index db3e656..1b08699 100644
 --- a/modules/pam_pwhistory/opasswd.h
 +++ b/modules/pam_pwhistory/opasswd.h
-@@ -36,10 +36,25 @@
+@@ -1,5 +1,6 @@
+ /*
+  * Copyright (c) 2008 Thorsten Kukuk <kukuk@suse.de>
++ * Copyright (c) 2013 Red Hat, Inc.
+  *
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions
+@@ -36,10 +37,32 @@
  #ifndef __OPASSWD_H__
  #define __OPASSWD_H__
  
@@ -181,6 +213,13 @@ index db3e656..21430be 100644
 -			  uid_t uid, const char *oldpass,
 -			  int howmany, int debug);
 +#define PAM_PWHISTORY_RUN_HELPER PAM_CRED_INSUFFICIENT
++
++#ifdef WITH_SELINUX
++#include <selinux/selinux.h>
++#define SELINUX_ENABLED is_selinux_enabled()>0
++#else
++#define SELINUX_ENABLED 0
++#endif
 +
 +#ifdef HELPER_COMPILE
 +#define PAMH_ARG_DECL(fname, ...) fname(__VA_ARGS__)
@@ -203,10 +242,18 @@ index db3e656..21430be 100644
  
  #endif /* __OPASSWD_H__ */
 diff --git a/modules/pam_pwhistory/pam_pwhistory.c b/modules/pam_pwhistory/pam_pwhistory.c
-index 654edd3..f54fd2a 100644
+index 654edd3..d6c5c47 100644
 --- a/modules/pam_pwhistory/pam_pwhistory.c
 +++ b/modules/pam_pwhistory/pam_pwhistory.c
-@@ -46,10 +46,14 @@
+@@ -1,6 +1,7 @@
+ /*
+  * Copyright (c) 2008, 2012 Thorsten Kukuk
+  * Author: Thorsten Kukuk <kukuk@thkukuk.de>
++ * Copyright (c) 2013 Red Hat, Inc.
+  *
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions
+@@ -46,10 +47,14 @@
  #include <stdlib.h>
  #include <string.h>
  #include <unistd.h>
@@ -222,7 +269,7 @@ index 654edd3..f54fd2a 100644
  
  #include <security/pam_modules.h>
  #include <security/pam_modutil.h>
-@@ -59,6 +63,7 @@
+@@ -59,6 +64,7 @@
  #include "opasswd.h"
  
  #define DEFAULT_BUFLEN 2048
@@ -230,7 +277,7 @@ index 654edd3..f54fd2a 100644
  
  struct options_t {
    int debug;
-@@ -102,6 +107,184 @@ parse_option (pam_handle_t *pamh, const char *argv, options_t *options)
+@@ -102,6 +108,184 @@ parse_option (pam_handle_t *pamh, const char *argv, options_t *options)
      pam_syslog (pamh, LOG_ERR, "pam_pwhistory: unknown option: %s", argv);
  }
  
@@ -415,7 +462,7 @@ index 654edd3..f54fd2a 100644
  
  /* This module saves the current crypted password in /etc/security/opasswd
     and then compares the new password with all entries in this file. */
-@@ -109,7 +292,6 @@ parse_option (pam_handle_t *pamh, const char *argv, options_t *options)
+@@ -109,7 +293,6 @@ parse_option (pam_handle_t *pamh, const char *argv, options_t *options)
  PAM_EXTERN int
  pam_sm_chauthtok (pam_handle_t *pamh, int flags, int argc, const char **argv)
  {
@@ -423,7 +470,7 @@ index 654edd3..f54fd2a 100644
    const char *newpass;
    const char *user;
      int retval, tries;
-@@ -154,31 +336,13 @@ pam_sm_chauthtok (pam_handle_t *pamh, int flags, int argc, const char **argv)
+@@ -154,31 +337,13 @@ pam_sm_chauthtok (pam_handle_t *pamh, int flags, int argc, const char **argv)
        return PAM_SUCCESS;
      }
  
@@ -460,7 +507,7 @@ index 654edd3..f54fd2a 100644
  
    newpass = NULL;
    tries = 0;
-@@ -207,8 +371,11 @@ pam_sm_chauthtok (pam_handle_t *pamh, int flags, int argc, const char **argv)
+@@ -207,8 +372,11 @@ pam_sm_chauthtok (pam_handle_t *pamh, int flags, int argc, const char **argv)
        if (options.debug)
  	pam_syslog (pamh, LOG_DEBUG, "check against old password file");
  
@@ -476,7 +523,7 @@ index 654edd3..f54fd2a 100644
  	      (flags & PAM_CHANGE_EXPIRED_AUTHTOK))
 diff --git a/modules/pam_pwhistory/pwhistory_helper.8.xml b/modules/pam_pwhistory/pwhistory_helper.8.xml
 new file mode 100644
-index 0000000..5f14d39
+index 0000000..a030176
 --- /dev/null
 +++ b/modules/pam_pwhistory/pwhistory_helper.8.xml
 @@ -0,0 +1,68 @@
@@ -543,7 +590,7 @@ index 0000000..5f14d39
 +    <title>AUTHOR</title>
 +      <para>
 +        Written by Tomas Mraz based on the code originally in
-+        <emphasis>pam_pwhistory</emphasis> module.
++        <emphasis>pam_pwhistory and pam_unix</emphasis> modules.
 +      </para>
 +  </refsect1>
 +
