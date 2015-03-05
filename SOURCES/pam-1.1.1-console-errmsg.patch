@@ -1,0 +1,12 @@
+diff -up Linux-PAM-1.1.1/modules/pam_console/pam_console_apply.c.errmsg Linux-PAM-1.1.1/modules/pam_console/pam_console_apply.c
+--- Linux-PAM-1.1.1/modules/pam_console/pam_console_apply.c.errmsg	2008-12-16 13:37:52.000000000 +0100
++++ Linux-PAM-1.1.1/modules/pam_console/pam_console_apply.c	2014-06-19 13:23:28.948343737 +0200
+@@ -65,7 +65,7 @@ parse_files(void)
+ 	on system locale */
+ 	oldlocale = setlocale(LC_COLLATE, "C");
+ 
+-	rc = glob(PERMS_GLOB, GLOB_NOCHECK, NULL, &globbuf);
++	rc = glob(PERMS_GLOB, 0, NULL, &globbuf);
+ 	setlocale(LC_COLLATE, oldlocale);
+ 	if (rc)
+ 		return;
