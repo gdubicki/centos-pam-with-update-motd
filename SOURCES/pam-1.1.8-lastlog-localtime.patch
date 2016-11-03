@@ -1,0 +1,22 @@
+diff -up Linux-PAM-1.1.8/modules/pam_lastlog/pam_lastlog.c.localtime Linux-PAM-1.1.8/modules/pam_lastlog/pam_lastlog.c
+--- Linux-PAM-1.1.8/modules/pam_lastlog/pam_lastlog.c.localtime	2016-03-03 10:01:15.000000000 +0100
++++ Linux-PAM-1.1.8/modules/pam_lastlog/pam_lastlog.c	2016-04-22 15:24:10.085018141 +0200
+@@ -276,12 +276,12 @@ last_login_read(pam_handle_t *pamh, int
+ 		time_t ll_time;
+ 
+ 		ll_time = last_login.ll_time;
+-		tm = localtime_r (&ll_time, &tm_buf);
+-		strftime (the_time, sizeof (the_time),
+-	        /* TRANSLATORS: "strftime options for date of last login" */
+-			  _(" %a %b %e %H:%M:%S %Z %Y"), tm);
+-
+-		date = the_time;
++		if ((tm = localtime_r (&ll_time, &tm_buf)) != NULL) {
++			strftime (the_time, sizeof (the_time),
++		        /* TRANSLATORS: "strftime options for date of last login" */
++				  _(" %a %b %e %H:%M:%S %Z %Y"), tm);
++			date = the_time;
++	    	}
+ 	    }
+ 
+ 	    /* we want & have the host? */

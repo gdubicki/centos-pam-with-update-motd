@@ -1,0 +1,91 @@
+diff -up Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.c.never Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.c
+--- Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.c.never	2016-03-03 10:01:15.000000000 +0100
++++ Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.c	2016-04-22 14:31:34.239752334 +0200
+@@ -125,17 +125,26 @@ args_parse(pam_handle_t *pamh, int argc,
+ 		}
+ 		else if (strncmp(argv[i], "unlock_time=", 12) == 0) {
+ 			unsigned int temp;
+-			if (sscanf(argv[i]+12, "%u", &temp) != 1 ||
++
++			if (strcmp(argv[i]+12, "never") == 0) {
++				opts->unlock_time = 0;
++			}
++			else if (sscanf(argv[i]+12, "%u", &temp) != 1 ||
+ 				temp > MAX_TIME_INTERVAL) {
+ 				pam_syslog(pamh, LOG_ERR,
+ 					"Bad number supplied for unlock_time argument");
+-        		} else {
++			}
++			else {
+ 				opts->unlock_time = temp;
+ 			}
+ 		}
+ 		else if (strncmp(argv[i], "root_unlock_time=", 17) == 0) {
+ 			unsigned int temp;
+-			if (sscanf(argv[i]+17, "%u", &temp) != 1 ||
++
++			if (strcmp(argv[i]+17, "never") == 0) {
++				opts->root_unlock_time = 0;
++			}
++			else if (sscanf(argv[i]+17, "%u", &temp) != 1 ||
+ 				temp > MAX_TIME_INTERVAL) {
+ 				pam_syslog(pamh, LOG_ERR,
+ 					"Bad number supplied for root_unlock_time argument");
+@@ -258,8 +267,8 @@ check_tally(pam_handle_t *pamh, struct o
+ 	}
+ 
+ 	if (opts->deny && failures >= opts->deny) {
+-		if ((opts->uid && latest_time + opts->unlock_time < opts->now) ||
+-			(!opts->uid && latest_time + opts->root_unlock_time < opts->now)) {
++		if ((opts->uid && opts->unlock_time && latest_time + opts->unlock_time < opts->now) ||
++			(!opts->uid && opts->root_unlock_time && latest_time + opts->root_unlock_time < opts->now)) {
+ #ifdef HAVE_LIBAUDIT
+ 			if (opts->action != FAILLOCK_ACTION_PREAUTH) { /* do not audit in preauth */
+ 				char buf[64];
+@@ -420,11 +429,17 @@ faillock_message(pam_handle_t *pamh, str
+ 			left = opts->latest_time + opts->root_unlock_time - opts->now;
+ 		}
+ 
+-		left /= 60; /* minutes */
++		if (left > 0) {
++			left = (left + 59)/60; /* minutes */
+ 
+-		pam_info(pamh, _("Account temporarily locked due to %d failed logins"),
+-			opts->failures);
+-		pam_info(pamh, _("(%d minutes left to unlock)"), (int)left);
++			pam_info(pamh, _("Account temporarily locked due to %d failed logins"),
++				opts->failures);
++			pam_info(pamh, _("(%d minutes left to unlock)"), (int)left);
++		}
++		else {
++			pam_info(pamh, _("Account locked due to %d failed logins"),
++				opts->failures);
++		}
+ 	}
+ }
+ 
+diff -up Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.8.xml.never Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.8.xml
+--- Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.8.xml.never	2016-04-22 15:25:57.000000000 +0200
++++ Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.8.xml	2016-04-28 16:43:14.109794294 +0200
+@@ -201,6 +201,21 @@
+                   <replaceable>n</replaceable> seconds after the lock out.
+                   The default is 600 (10 minutes).
+                 </para>
++                <para>
++                  If the <replaceable>n</replaceable> is set to never or 0
++                  the access will not be reenabled at all until administrator
++                  explicitly reenables it with the <command>faillock</command> command.
++                  Note though that the default directory that <emphasis>pam_faillock</emphasis>
++                  uses is usually cleared on system boot so the access will be also reenabled
++                  after system reboot. If that is undesirable a different tally directory
++                  must be set with the <option>dir</option> option.
++                </para>
++                <para>
++                  Also note that it is usually undesirable to permanently lock
++                  out the users as they can become easily a target of denial of service
++                  attack unless the usernames are random and kept secret to potential
++                  attackers.
++                </para>
+               </listitem>
+             </varlistentry>
+             <varlistentry>

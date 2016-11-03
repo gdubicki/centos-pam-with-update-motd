@@ -1,0 +1,19 @@
+diff -up Linux-PAM-1.1.8/modules/pam_loginuid/pam_loginuid.c.log-auditd Linux-PAM-1.1.8/modules/pam_loginuid/pam_loginuid.c
+--- Linux-PAM-1.1.8/modules/pam_loginuid/pam_loginuid.c.log-auditd	2013-06-18 16:11:21.000000000 +0200
++++ Linux-PAM-1.1.8/modules/pam_loginuid/pam_loginuid.c	2016-04-22 14:21:35.868204427 +0200
+@@ -195,9 +195,12 @@ _pam_loginuid(pam_handle_t *pamh, int fl
+ 		argv++;
+ 	}
+ 
+-	if (require_auditd)
+-		return check_auditd();
+-	else
++	if (require_auditd) {
++		int rc = check_auditd();
++		if (rc != PAM_SUCCESS)
++			pam_syslog(pamh, LOG_ERR, "required running auditd not detected");
++		return rc;
++	} else
+ #endif
+ 		return PAM_SUCCESS;
+ }

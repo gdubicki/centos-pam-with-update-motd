@@ -3,7 +3,7 @@
 Summary: An extensible library which provides authentication for applications
 Name: pam
 Version: 1.1.8
-Release: 12%{?dist}.1
+Release: 18%{?dist}
 # The library is BSD licensed with option to relicense as GPLv2+
 # - this option is redundant as the BSD license allows that anyway.
 # pam_timestamp, pam_loginuid, and pam_console modules are GPLv2+.
@@ -56,6 +56,14 @@ Patch41: pam-1.1.8-limits-check-process.patch
 Patch42: pam-1.1.8-limits-docfix.patch
 Patch43: pam-1.1.8-audit-user-mgmt.patch
 Patch44: pam-1.1.8-cve-2015-3238.patch
+Patch45: pam-1.1.8-unix-expiry.patch
+Patch46: pam-1.1.8-man-environment.patch
+Patch47: pam-1.1.8-loginuid-log-auditd.patch
+Patch48: pam-1.1.8-faillock-never.patch
+Patch49: pam-1.1.8-relax-audit.patch
+Patch50: pam-1.1.8-lastlog-localtime.patch
+Patch51: pam-1.1.8-man-delay.patch
+Patch52: pam-1.1.8-succeed-if-large-uid.patch
 
 %define _pamlibdir %{_libdir}
 %define _moduledir %{_libdir}/security
@@ -145,6 +153,14 @@ mv pam-redhat-%{pam_redhat_version}/* modules
 %patch42 -p1 -b .docfix
 %patch43 -p1 -b .audit-user-mgmt
 %patch44 -p1 -b .password-limit
+%patch45 -p1 -b .expiry
+%patch46 -p1 -b .man-environment
+%patch47 -p1 -b .log-auditd
+%patch48 -p1 -b .never
+%patch49 -p1 -b .relax-audit
+%patch50 -p1 -b .localtime
+%patch51 -p1 -b .delay
+%patch52 -p1 -b .large-uid
 
 %build
 autoreconf -i
@@ -393,7 +409,25 @@ fi
 %doc doc/adg/*.txt doc/adg/html
 
 %changelog
-* Tue Aug  4 2015 Tomáš Mráz <tmraz@redhat.com> 1.1.8-12.1
+* Tue Jul 19 2016 Tomáš Mráz <tmraz@redhat.com> 1.1.8-18
+- pam_succeed_if: fix handling of large uids, tty, and rhost
+
+* Mon May 30 2016 Tomáš Mráz <tmraz@redhat.com> 1.1.8-17
+- fix pam_fail_delay() manual page (#1130053)
+
+* Thu Apr 28 2016 Tomáš Mráz <tmraz@redhat.com> 1.1.8-15
+- pam_faillock: support permanent locking of user with
+  unlock_time=never option
+
+* Fri Apr 22 2016 Tomáš Mráz <tmraz@redhat.com> 1.1.8-14
+- pam_unix: add no_pass_expiry option for ignoring password
+  expiration in crond and sshd with public key authentication
+- add manual page for environment(5) (#1110257)
+- pam_loginuid: log if auditd not detected
+- always ignore audit error when -EPERM is returned (#1287800)
+- pam_lastlog: fix possible NULL dereference when localtime fails (#1313537)
+
+* Tue Aug  4 2015 Tomáš Mráz <tmraz@redhat.com> 1.1.8-13
 - fix CVE-2015-3238 - DoS due to blocking pipe with very long password
 
 * Fri Oct 17 2014 Tomáš Mráz <tmraz@redhat.com> 1.1.8-12

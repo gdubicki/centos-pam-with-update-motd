@@ -1,0 +1,12 @@
+diff -up Linux-PAM-1.1.8/libpam/pam_audit.c.relax-audit Linux-PAM-1.1.8/libpam/pam_audit.c
+--- Linux-PAM-1.1.8/libpam/pam_audit.c.relax-audit	2016-03-03 10:01:15.000000000 +0100
++++ Linux-PAM-1.1.8/libpam/pam_audit.c	2016-04-22 15:18:55.692925308 +0200
+@@ -53,7 +53,7 @@ _pam_audit_writelog(pam_handle_t *pamh,
+   pamh->audit_state |= PAMAUDIT_LOGGED;
+ 
+   if (rc < 0) {
+-      if (rc == -EPERM && getuid() != 0)
++      if (rc == -EPERM)
+           return 0;
+       if (errno != old_errno) {
+           old_errno = errno;

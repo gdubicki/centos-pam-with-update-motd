@@ -1,0 +1,78 @@
+diff -up Linux-PAM-1.1.8/modules/pam_env/Makefile.am.environment Linux-PAM-1.1.8/modules/pam_env/Makefile.am
+--- Linux-PAM-1.1.8/modules/pam_env/Makefile.am.environment	2013-06-18 16:11:21.000000000 +0200
++++ Linux-PAM-1.1.8/modules/pam_env/Makefile.am	2016-04-22 14:10:49.921649262 +0200
+@@ -7,7 +7,7 @@ MAINTAINERCLEANFILES = $(MANS) README
+ 
+ EXTRA_DIST = README pam_env.conf $(MANS) $(XMLS) tst-pam_env environment
+ 
+-man_MANS = pam_env.conf.5 pam_env.8
++man_MANS = pam_env.conf.5 pam_env.8 environment.5
+ 
+ XMLS = README.xml pam_env.conf.5.xml pam_env.8.xml
+ 
+@@ -30,6 +30,7 @@ sysconf_DATA = environment
+ if ENABLE_REGENERATE_MAN
+ noinst_DATA = README
+ README: pam_env.8.xml pam_env.conf.5.xml
++environment.5: pam_env.conf.5.xml
+ -include $(top_srcdir)/Make.xml.rules
+ endif
+ 
+diff -up Linux-PAM-1.1.8/modules/pam_env/Makefile.in.environment Linux-PAM-1.1.8/modules/pam_env/Makefile.in
+--- Linux-PAM-1.1.8/modules/pam_env/Makefile.in.environment	2016-04-22 14:14:41.475866891 +0200
++++ Linux-PAM-1.1.8/modules/pam_env/Makefile.in	2016-04-22 14:13:58.239892651 +0200
+@@ -285,7 +285,7 @@ top_srcdir = @top_srcdir@
+ CLEANFILES = *~
+ MAINTAINERCLEANFILES = $(MANS) README
+ EXTRA_DIST = README pam_env.conf $(MANS) $(XMLS) tst-pam_env environment
+-man_MANS = pam_env.conf.5 pam_env.8
++man_MANS = pam_env.conf.5 pam_env.8 environment.5
+ XMLS = README.xml pam_env.conf.5.xml pam_env.8.xml
+ securelibdir = $(SECUREDIR)
+ secureconfdir = $(SCONFIGDIR)
+@@ -836,6 +836,7 @@ uninstall-man: uninstall-man5 uninstall-
+ 	uninstall-sysconfDATA
+ 
+ @ENABLE_REGENERATE_MAN_TRUE@README: pam_env.8.xml pam_env.conf.5.xml
++@ENABLE_REGENERATE_MAN_TRUE@environment.5: pam_env.conf.5.xml
+ @ENABLE_REGENERATE_MAN_TRUE@-include $(top_srcdir)/Make.xml.rules
+ 
+ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+diff -up Linux-PAM-1.1.8/modules/pam_env/pam_env.conf.5.xml.environment Linux-PAM-1.1.8/modules/pam_env/pam_env.conf.5.xml
+--- Linux-PAM-1.1.8/modules/pam_env/pam_env.conf.5.xml.environment	2013-06-18 16:11:21.000000000 +0200
++++ Linux-PAM-1.1.8/modules/pam_env/pam_env.conf.5.xml	2016-04-22 14:12:49.150335851 +0200
+@@ -12,7 +12,8 @@
+ 
+   <refnamediv>
+     <refname>pam_env.conf</refname>
+-    <refpurpose>the environment variables config file</refpurpose>
++    <refname>environment</refname>
++    <refpurpose>the environment variables config files</refpurpose>
+   </refnamediv>
+ 
+ 
+@@ -58,6 +59,14 @@
+       at front) can be used to mark this line as a comment line.
+     </para>
+ 
++    <para>
++      The <filename>/etc/environment</filename> file specifies
++      the environment variables to be set. The file must consist of simple
++      <emphasis>NAME=VALUE</emphasis> pairs on separate lines.
++      The <citerefentry><refentrytitle>pam_env</refentrytitle><manvolnum>8</manvolnum></citerefentry>
++      module will read the file after the <filename>pam_env.conf</filename>
++      file.
++    </para>
+   </refsect1>
+ 
+   <refsect1 id="pam_env.conf-examples">
+@@ -110,7 +119,8 @@
+     <para>
+       <citerefentry><refentrytitle>pam_env</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
+       <citerefentry><refentrytitle>pam.d</refentrytitle><manvolnum>5</manvolnum></citerefentry>,
+-      <citerefentry><refentrytitle>pam</refentrytitle><manvolnum>8</manvolnum></citerefentry>
++      <citerefentry><refentrytitle>pam</refentrytitle><manvolnum>8</manvolnum></citerefentry>,
++      <citerefentry><refentrytitle>environ</refentrytitle><manvolnum>7</manvolnum></citerefentry>
+     </para>
+   </refsect1>
+ 
