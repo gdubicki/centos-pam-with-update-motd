@@ -1,0 +1,151 @@
+diff -up Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.c.admin-group Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.c
+--- Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.c.admin-group	2016-04-22 15:25:57.673445386 +0200
++++ Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.c	2017-09-08 14:39:47.411306464 +0200
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2010 Tomas Mraz <tmraz@redhat.com>
++ * Copyright (c) 2010, 2017 Tomas Mraz <tmraz@redhat.com>
+  *
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions
+@@ -78,9 +78,11 @@ struct options {
+ 	unsigned int root_unlock_time;
+ 	const char *dir;
+ 	const char *user;
++	const char *admin_group;
+ 	int failures;
+ 	uint64_t latest_time;
+ 	uid_t uid;
++	int is_admin;
+ 	uint64_t now;
+ };
+ 
+@@ -152,6 +154,9 @@ args_parse(pam_handle_t *pamh, int argc,
+ 				opts->root_unlock_time = temp;
+ 			}
+ 		}
++		else if (strncmp(argv[i], "admin_group=", 12) == 0) {
++			opts->admin_group = argv[i] + 12;
++		}
+  		else if (strcmp(argv[i], "preauth") == 0) {
+ 			opts->action = FAILLOCK_ACTION_PREAUTH;
+ 		}
+@@ -209,6 +214,17 @@ static int get_pam_user(pam_handle_t *pa
+ 	}
+ 	opts->user = user;
+ 	opts->uid = pwd->pw_uid;
++
++	if (pwd->pw_uid == 0) {
++		opts->is_admin = 1;
++		return PAM_SUCCESS;
++	}
++
++	if (opts->admin_group && *opts->admin_group) {
++		opts->is_admin = pam_modutil_user_in_group_uid_nam(pamh,
++			pwd->pw_uid, opts->admin_group);
++	}
++
+ 	return PAM_SUCCESS;
+ }
+ 
+@@ -239,7 +255,7 @@ check_tally(pam_handle_t *pamh, struct o
+ 		return PAM_SYSTEM_ERR;
+ 	}
+ 
+-	if (opts->uid == 0 && !(opts->flags & FAILLOCK_FLAG_DENY_ROOT)) {
++	if (opts->is_admin && !(opts->flags & FAILLOCK_FLAG_DENY_ROOT)) {
+ 		return PAM_SUCCESS;
+ 	}
+ 
+@@ -262,17 +278,14 @@ check_tally(pam_handle_t *pamh, struct o
+ 
+ 	opts->failures = failures;
+ 
+-	if (opts->uid == 0 && !(opts->flags & FAILLOCK_FLAG_DENY_ROOT)) {
+-		return PAM_SUCCESS;
+-	}
+-
+ 	if (opts->deny && failures >= opts->deny) {
+-		if ((opts->uid && opts->unlock_time && latest_time + opts->unlock_time < opts->now) ||
+-			(!opts->uid && opts->root_unlock_time && latest_time + opts->root_unlock_time < opts->now)) {
++		if ((!opts->is_admin && opts->unlock_time && latest_time + opts->unlock_time < opts->now) ||
++			(opts->is_admin && opts->root_unlock_time && latest_time + opts->root_unlock_time < opts->now)) {
+ #ifdef HAVE_LIBAUDIT
+ 			if (opts->action != FAILLOCK_ACTION_PREAUTH) { /* do not audit in preauth */
+ 				char buf[64];
+ 				int audit_fd;
++				const void *rhost = NULL, *tty = NULL;
+ 
+ 				audit_fd = audit_open();
+ 				/* If there is an error & audit support is in the kernel report error */
+@@ -280,9 +293,11 @@ check_tally(pam_handle_t *pamh, struct o
+ 					errno == EAFNOSUPPORT))
+ 					return PAM_SYSTEM_ERR;
+ 
++				(void)pam_get_item(pamh, PAM_TTY, &tty);
++				(void)pam_get_item(pamh, PAM_RHOST, &rhost);
+ 				snprintf(buf, sizeof(buf), "pam_faillock uid=%u ", opts->uid);
+ 				audit_log_user_message(audit_fd, AUDIT_RESP_ACCT_UNLOCK_TIMED, buf,
+-					NULL, NULL, NULL, 1);
++					rhost, NULL, tty, 1);
+ 			}
+ #endif
+ 			opts->flags |= FAILLOCK_FLAG_UNLOCKED;
+@@ -398,7 +413,7 @@ write_tally(pam_handle_t *pamh, struct o
+ 		audit_log_user_message(audit_fd, AUDIT_ANOM_LOGIN_FAILURES, buf,
+ 			NULL, NULL, NULL, 1);
+ 
+-		if (opts->uid != 0 || (opts->flags & FAILLOCK_FLAG_DENY_ROOT)) {
++		if (!opts->is_admin || (opts->flags & FAILLOCK_FLAG_DENY_ROOT)) {
+ 			audit_log_user_message(audit_fd, AUDIT_RESP_ACCT_LOCK, buf,
+ 				NULL, NULL, NULL, 1);
+ 		}
+@@ -422,11 +437,11 @@ faillock_message(pam_handle_t *pamh, str
+ 	int64_t left;
+ 
+ 	if (!(opts->flags & FAILLOCK_FLAG_SILENT)) {
+-		if (opts->uid) {
+-			left = opts->latest_time + opts->unlock_time - opts->now;
++		if (opts->is_admin) {
++			left = opts->latest_time + opts->root_unlock_time - opts->now;
+ 		}
+ 		else {
+-			left = opts->latest_time + opts->root_unlock_time - opts->now;
++			left = opts->latest_time + opts->unlock_time - opts->now;
+ 		}
+ 
+ 		if (left > 0) {
+diff -up Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.8.xml.admin-group Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.8.xml
+--- Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.8.xml.admin-group	2016-04-28 16:43:14.109794294 +0200
++++ Linux-PAM-1.1.8/modules/pam_faillock/pam_faillock.8.xml	2017-09-08 14:37:33.535130222 +0200
+@@ -40,6 +40,9 @@
+         root_unlock_time=<replaceable>n</replaceable>
+       </arg>
+       <arg choice="opt">
++        admin_group=<replaceable>name</replaceable>
++      </arg>
++      <arg choice="opt">
+         audit
+       </arg>
+       <arg choice="opt">
+@@ -242,6 +245,20 @@
+                 </para>
+               </listitem>
+             </varlistentry>
++            <varlistentry>
++              <term>
++                <option>admin_group=<replaceable>name</replaceable></option>
++              </term>
++              <listitem>
++                <para>
++                  If a group name is specified with this option, members
++                  of the group will be handled by this module the same as
++                  the root account (the options <option>even_deny_root></option>
++                  and <option>root_unlock_time</option> will apply to them.
++                  By default the option is not set.
++                </para>
++              </listitem>
++            </varlistentry>
+         </variablelist>
+   </refsect1>
+ 

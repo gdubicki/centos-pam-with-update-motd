@@ -1,0 +1,13 @@
+diff -up Linux-PAM-1.1.8/doc/man/pam.8.xml.space Linux-PAM-1.1.8/doc/man/pam.8.xml
+--- Linux-PAM-1.1.8/doc/man/pam.8.xml.space	2013-06-18 16:11:21.000000000 +0200
++++ Linux-PAM-1.1.8/doc/man/pam.8.xml	2017-09-08 14:22:58.878416174 +0200
+@@ -48,8 +48,7 @@
+       can be set by individual configuration files located in the
+       <filename>/etc/pam.d/</filename> directory. The presence of this
+       directory will cause <emphasis remap='B'>Linux-PAM</emphasis> to
+-      <emphasis remap='I'>ignore</emphasis>
+-      <filename>/etc/pam.conf</filename>.
++      <emphasis remap='I'>ignore </emphasis><filename>/etc/pam.conf</filename>.
+     </para>
+ 
+ 

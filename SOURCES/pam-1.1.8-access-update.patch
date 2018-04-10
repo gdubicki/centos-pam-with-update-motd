@@ -1,0 +1,392 @@
+diff -up Linux-PAM-1.1.8/modules/pam_access/access.conf.access-update Linux-PAM-1.1.8/modules/pam_access/access.conf
+--- Linux-PAM-1.1.8/modules/pam_access/access.conf.access-update	2013-06-18 16:11:21.000000000 +0200
++++ Linux-PAM-1.1.8/modules/pam_access/access.conf	2017-09-08 14:06:16.420102221 +0200
+@@ -18,7 +18,7 @@
+ # pam_access with X applications that provide PAM_TTY values that are
+ # the display variable like "host:0".]
+ #
+-# 	permission : users : origins
++# 	permission:users:origins
+ #
+ # The first field should be a "+" (access granted) or "-" (access denied)
+ # character.
+@@ -79,44 +79,44 @@
+ ##############################################################################
+ #
+ # User "root" should be allowed to get access via cron .. tty5 tty6.
+-#+ : root : cron crond :0 tty1 tty2 tty3 tty4 tty5 tty6
++#+:root:cron crond :0 tty1 tty2 tty3 tty4 tty5 tty6
+ #
+ # User "root" should be allowed to get access from hosts with ip addresses.
+-#+ : root : 192.168.200.1 192.168.200.4 192.168.200.9
+-#+ : root : 127.0.0.1
++#+:root:192.168.200.1 192.168.200.4 192.168.200.9
++#+:root:127.0.0.1
+ #
+ # User "root" should get access from network 192.168.201.
+ # This term will be evaluated by string matching.
+ # comment: It might be better to use network/netmask instead.
+ #          The same is 192.168.201.0/24 or 192.168.201.0/255.255.255.0
+-#+ : root : 192.168.201.
++#+:root:192.168.201.
+ #
+ # User "root" should be able to have access from domain.
+ # Uses string matching also.
+-#+ : root : .foo.bar.org
++#+:root:.foo.bar.org
+ #
+ # User "root" should be denied to get access from all other sources.
+-#- : root : ALL
++#-:root:ALL
+ #
+ # User "foo" and members of netgroup "nis_group" should be
+ # allowed to get access from all sources.
+ # This will only work if netgroup service is available.
+-#+ : @nis_group foo : ALL
++#+:@nis_group foo:ALL
+ #
+ # User "john" should get access from ipv4 net/mask
+-#+ : john : 127.0.0.0/24
++#+:john:127.0.0.0/24
+ #
+ # User "john" should get access from ipv4 as ipv6 net/mask
+-#+ : john : ::ffff:127.0.0.0/127
++#+:john:::ffff:127.0.0.0/127
+ #
+ # User "john" should get access from ipv6 host address
+-#+ : john : 2001:4ca0:0:101::1
++#+:john:2001:4ca0:0:101::1
+ #
+ # User "john" should get access from ipv6 host address (same as above)
+-#+ : john : 2001:4ca0:0:101:0:0:0:1
++#+:john:2001:4ca0:0:101:0:0:0:1
+ #
+ # User "john" should get access from ipv6 net/mask
+-#+ : john : 2001:4ca0:0:101::/64
++#+:john:2001:4ca0:0:101::/64
+ #
+ # All other users should be denied to get access from all sources.
+-#- : ALL : ALL
++#-:ALL:ALL
+diff -up Linux-PAM-1.1.8/modules/pam_access/access.conf.5.xml.access-update Linux-PAM-1.1.8/modules/pam_access/access.conf.5.xml
+--- Linux-PAM-1.1.8/modules/pam_access/access.conf.5.xml.access-update	2013-06-18 16:11:21.000000000 +0200
++++ Linux-PAM-1.1.8/modules/pam_access/access.conf.5.xml	2017-09-08 14:05:41.126320653 +0200
+@@ -21,8 +21,12 @@
+     <para>
+       The <filename>/etc/security/access.conf</filename> file specifies
+       (<replaceable>user/group</replaceable>, <replaceable>host</replaceable>),
+-      (<replaceable>user/group</replaceable>, <replaceable>network/netmask</replaceable>) or
+-      (<replaceable>user/group</replaceable>, <replaceable>tty</replaceable>)
++      (<replaceable>user/group</replaceable>, <replaceable>network/netmask</replaceable>),
++      (<replaceable>user/group</replaceable>, <replaceable>tty</replaceable>),
++      (<replaceable>user/group</replaceable>,
++      <replaceable>X-$DISPLAY-value</replaceable>), or
++      (<replaceable>user/group</replaceable>,
++      <replaceable>pam-service-name</replaceable>)
+       combinations for which a login will be either accepted or refused.
+     </para>
+     <para>
+@@ -33,7 +37,14 @@
+       combination, or, in case of non-networked logins, the first entry
+       that matches the
+       (<replaceable>user/group</replaceable>, <replaceable>tty</replaceable>)
+-      combination.  The permissions field of that table entry determines
++      combination, or in the case of non-networked logins without a
++      tty, the first entry that matches the
++      (<replaceable>user/group</replaceable>,
++      <replaceable>X-$DISPLAY-value</replaceable>) or
++      (<replaceable>user/group</replaceable>,
++      <replaceable>pam-service-name/</replaceable>)
++      combination.  The permissions field of that table entry
++      determines
+       whether the login will be accepted or refused.
+    </para>
+ 
+@@ -65,14 +76,27 @@
+     <para>
+       The third field, the <replaceable>origins</replaceable>
+       field, should be a list of one or more tty names (for non-networked
+-      logins), host names, domain names (begin with "."), host addresses,
++      logins), X <varname>$DISPLAY</varname> values or PAM service
++      names (for non-networked logins without a tty), host names,
++      domain names (begin with "."), host addresses,
+       internet network numbers (end with "."), internet network addresses
+       with network mask (where network mask can be a decimal number or an
+       internet address also), <emphasis>ALL</emphasis> (which always matches)
+-      or <emphasis>LOCAL</emphasis>. <emphasis>LOCAL</emphasis>
+-      keyword matches if and only if the <emphasis>PAM_RHOST</emphasis> is
+-      not set and &lt;origin&gt; field is thus set from
+-      <emphasis>PAM_TTY</emphasis> or <emphasis>PAM_SERVICE</emphasis>".
++      or <emphasis>LOCAL</emphasis>. The <emphasis>LOCAL</emphasis>
++      keyword matches if and only if
++      <citerefentry><refentrytitle>pam_get_item</refentrytitle><manvolnum>3</manvolnum></citerefentry>,
++      when called with an <parameter>item_type</parameter> of
++      <emphasis>PAM_RHOST</emphasis>, returns <code>NULL</code> or an
++      empty string (and therefore the
++      <replaceable>origins</replaceable> field is compared against the
++      return value of
++      <citerefentry><refentrytitle>pam_get_item</refentrytitle><manvolnum>3</manvolnum></citerefentry>
++      called with an <parameter>item_type</parameter> of
++      <emphasis>PAM_TTY</emphasis> or, absent that,
++      <emphasis>PAM_SERVICE</emphasis>).
++    </para>
++
++    <para>
+       If supported by the system you can use
+       <emphasis>@netgroupname</emphasis> in host or user patterns. The
+       <emphasis>@@netgroupname</emphasis> syntax is supported in the user
+@@ -115,7 +139,7 @@
+       <emphasis>tty1</emphasis>, ..., <emphasis>tty5</emphasis>,
+       <emphasis>tty6</emphasis>.
+     </para>
+-    <para>+ : root : crond :0 tty1 tty2 tty3 tty4 tty5 tty6</para>
++    <para>+:root:crond :0 tty1 tty2 tty3 tty4 tty5 tty6</para>
+ 
+     <para>
+       User <emphasis>root</emphasis> should be allowed to get access from
+@@ -123,8 +147,8 @@
+       connection have to be a IPv4 one, a IPv6 connection from a host with
+       one of this IPv4 addresses does work, too.
+     </para>
+-    <para>+ : root : 192.168.200.1 192.168.200.4 192.168.200.9</para>
+-    <para>+ : root : 127.0.0.1</para>
++    <para>+:root:192.168.200.1 192.168.200.4 192.168.200.9</para>
++    <para>+:root:127.0.0.1</para>
+ 
+     <para>
+       User <emphasis>root</emphasis> should get access from network
+@@ -134,44 +158,44 @@
+       <emphasis>192.168.201.0/24</emphasis> or
+       <emphasis>192.168.201.0/255.255.255.0</emphasis>.
+     </para>
+-    <para>+ : root : 192.168.201.</para>
++    <para>+:root:192.168.201.</para>
+ 
+     <para>
+       User <emphasis>root</emphasis> should be able to have access from hosts
+       <emphasis>foo1.bar.org</emphasis> and <emphasis>foo2.bar.org</emphasis>
+       (uses string matching also).
+     </para>
+-    <para>+ : root : foo1.bar.org foo2.bar.org</para>
++    <para>+:root:foo1.bar.org foo2.bar.org</para>
+ 
+     <para>
+       User <emphasis>root</emphasis> should be able to have access from
+       domain <emphasis>foo.bar.org</emphasis> (uses string matching also).
+     </para>
+-    <para>+ : root : .foo.bar.org</para>
++    <para>+:root:.foo.bar.org</para>
+ 
+     <para>
+       User <emphasis>root</emphasis> should be denied to get access
+       from all other sources.
+     </para>
+-    <para>- : root : ALL</para>
++    <para>-:root:ALL</para>
+ 
+     <para>
+       User <emphasis>foo</emphasis> and members of netgroup
+       <emphasis>admins</emphasis> should be allowed to get access
+       from all sources. This will only work if netgroup service is available.
+     </para>
+-    <para>+ : @admins foo : ALL</para>
++    <para>+:@admins foo:ALL</para>
+ 
+     <para>
+       User <emphasis>john</emphasis> and <emphasis>foo</emphasis>
+       should get access from IPv6 host address.
+     </para>
+-    <para>+ : john foo : 2001:db8:0:101::1</para>
++    <para>+:john foo:2001:db8:0:101::1</para>
+ 
+     <para>
+       User <emphasis>john</emphasis> should get access from IPv6 net/mask.
+     </para>
+-    <para>+ : john : 2001:db8:0:101::/64</para>
++    <para>+:john:2001:db8:0:101::/64</para>
+ 
+     <para>
+       Disallow console logins to all but the shutdown, sync and all
+@@ -182,10 +206,22 @@
+     <para>
+       All other users should be denied to get access from all sources.
+     </para>
+-    <para>- : ALL : ALL</para>
++    <para>-:ALL:ALL</para>
+ 
+   </refsect1>
+ 
++  <refsect1 id="access.conf-notes">
++    <title>NOTES</title>
++    <para>
++      The default separators of list items in a field are space, ',', and tabulator
++      characters. Thus conveniently if spaces are put at the beginning and the end of
++      the fields they are ignored. However if the list separator is changed with the
++      <emphasis>listsep</emphasis> option, the spaces will become part of the actual
++      item and the line will be most probably ignored. For this reason, it is not
++      recommended to put spaces around the ':' characters.
++    </para>
++  </refsect1>
++
+   <refsect1 id="access.conf-see_also">
+     <title>SEE ALSO</title>
+     <para>
+diff -up Linux-PAM-1.1.8/modules/pam_access/Makefile.am.access-update Linux-PAM-1.1.8/modules/pam_access/Makefile.am
+--- Linux-PAM-1.1.8/modules/pam_access/Makefile.am.access-update	2013-06-18 16:11:21.000000000 +0200
++++ Linux-PAM-1.1.8/modules/pam_access/Makefile.am	2017-09-08 14:10:47.223163175 +0200
+@@ -15,7 +15,8 @@ securelibdir = $(SECUREDIR)
+ secureconfdir = $(SCONFIGDIR)
+ 
+ AM_CFLAGS = -I$(top_srcdir)/libpam/include -I$(top_srcdir)/libpamc/include \
+-	-DPAM_ACCESS_CONFIG=\"$(SCONFIGDIR)/access.conf\" $(NIS_CFLAGS)
++	-DPAM_ACCESS_CONFIG=\"$(SCONFIGDIR)/access.conf\" \
++	-DACCESS_CONF_GLOB=\"$(SCONFIGDIR)/access.d/*.conf\" $(NIS_CFLAGS)
+ AM_LDFLAGS =  -no-undefined -avoid-version -module
+ if HAVE_VERSIONING
+   AM_LDFLAGS += -Wl,--version-script=$(srcdir)/../modules.map
+diff -up Linux-PAM-1.1.8/modules/pam_access/pam_access.c.access-update Linux-PAM-1.1.8/modules/pam_access/pam_access.c
+--- Linux-PAM-1.1.8/modules/pam_access/pam_access.c.access-update	2013-06-18 16:11:21.000000000 +0200
++++ Linux-PAM-1.1.8/modules/pam_access/pam_access.c	2017-09-08 14:03:45.620762824 +0200
+@@ -44,6 +44,7 @@
+ #include <arpa/inet.h>
+ #include <netdb.h>
+ #include <sys/socket.h>
++#include <glob.h>
+ #ifdef HAVE_RPCSVC_YPCLNT_H
+ #include <rpcsvc/ypclnt.h>
+ #endif
+@@ -90,6 +91,7 @@
+ #define ALL             2
+ #define YES             1
+ #define NO              0
++#define NOMATCH        -1
+ 
+  /*
+   * A structure to bundle up all login-related information to keep the
+@@ -412,13 +414,17 @@ login_access (pam_handle_t *pamh, struct
+ 	return NO;
+     }
+ #ifdef HAVE_LIBAUDIT
+-    if (!item->noaudit && line[0] == '-' && (match == YES || (match == ALL &&
+-	nonall_match == YES))) {
++    if (!item->noaudit && (match == YES || (match == ALL &&
++	nonall_match == YES)) && line[0] == '-') {
+ 	pam_modutil_audit_write(pamh, AUDIT_ANOM_LOGIN_LOCATION,
+ 	    "pam_access", 0);
+     }
+ #endif
+-    return (match == NO || (line[0] == '+'));
++    if (match == NO)
++	return NOMATCH;
++    if (line[0] == '+')
++	return YES;
++    return NO;
+ }
+ 
+ 
+@@ -524,7 +530,9 @@ user_match (pam_handle_t *pamh, char *to
+     /* Try to split on a pattern (@*[^@]+)(@+.*) */
+     for (at = tok; *at == '@'; ++at);
+ 
+-    if ((at = strchr(at, '@')) != NULL) {
++    if (tok[0] == '(' && tok[strlen(tok) - 1] == ')') {
++      return (group_match (pamh, tok, string, item->debug));
++    } else if ((at = strchr(at, '@')) != NULL) {
+         /* split user@host pattern */
+ 	if (item->hostname == NULL)
+ 	    return NO;
+@@ -549,9 +557,7 @@ user_match (pam_handle_t *pamh, char *to
+ 		hostname = item->hostname;
+ 	}
+         return (netgroup_match (pamh, tok + 1, hostname, string, item->debug));
+-    } else if (tok[0] == '(' && tok[strlen(tok) - 1] == ')')
+-      return (group_match (pamh, tok, string, item->debug));
+-    else if ((rv=string_match (pamh, tok, string, item->debug)) != NO) /* ALL or exact match */
++    } else if ((rv=string_match (pamh, tok, string, item->debug)) != NO) /* ALL or exact match */
+       return rv;
+     else if (item->only_new_group_syntax == NO &&
+ 	     pam_modutil_user_in_group_nam_nam (pamh,
+@@ -573,7 +579,7 @@ group_match (pam_handle_t *pamh, const c
+ 
+     if (debug)
+         pam_syslog (pamh, LOG_DEBUG,
+-		    "group_match: grp=%s, user=%s", grptok, usr);
++		    "group_match: grp=%s, user=%s", tok, usr);
+ 
+     if (strlen(tok) < 3)
+         return NO;
+@@ -808,6 +814,7 @@ pam_sm_authenticate (pam_handle_t *pamh,
+     const char *user=NULL;
+     const void *void_from=NULL;
+     const char *from;
++    const char const *default_config = PAM_ACCESS_CONFIG;
+     struct passwd *user_pw;
+     char hostname[MAXHOSTNAMELEN + 1];
+     int rv;
+@@ -829,7 +836,7 @@ pam_sm_authenticate (pam_handle_t *pamh,
+      */
+     memset(&loginfo, '\0', sizeof(loginfo));
+     loginfo.user = user_pw;
+-    loginfo.config_file = PAM_ACCESS_CONFIG;
++    loginfo.config_file = default_config;
+ 
+     /* parse the argument list */
+ 
+@@ -900,6 +907,26 @@ pam_sm_authenticate (pam_handle_t *pamh,
+ 
+     rv = login_access(pamh, &loginfo);
+ 
++    if (rv == NOMATCH && loginfo.config_file == default_config) {
++	glob_t globbuf;
++	int i, glob_rv;
++
++	/* We do not manipulate locale as setlocale() is not
++	 * thread safe. We could use uselocale() in future.
++	 */
++	glob_rv = glob(ACCESS_CONF_GLOB, GLOB_ERR, NULL, &globbuf);
++	if (!glob_rv) {
++	    /* Parse the *.conf files. */
++	    for (i = 0; globbuf.gl_pathv[i] != NULL; i++) {
++		loginfo.config_file = globbuf.gl_pathv[i];
++		rv = login_access(pamh, &loginfo);
++		if (rv != NOMATCH)
++		    break;
++	    }
++	    globfree(&globbuf);
++	}
++    }
++
+     if (loginfo.gai_rv == 0 && loginfo.res)
+ 	freeaddrinfo(loginfo.res);
+ 
+diff -up Linux-PAM-1.1.8/modules/pam_access/pam_access.8.xml.access-update Linux-PAM-1.1.8/modules/pam_access/pam_access.8.xml
+--- Linux-PAM-1.1.8/modules/pam_access/pam_access.8.xml.access-update	2013-06-18 16:11:21.000000000 +0200
++++ Linux-PAM-1.1.8/modules/pam_access/pam_access.8.xml	2017-09-08 14:04:25.365642960 +0200
+@@ -50,16 +50,25 @@
+       The pam_access PAM module is mainly for access management.
+       It provides logdaemon style login access control based on login
+       names, host or domain names, internet addresses or network numbers,
+-      or on terminal line names in case of non-networked logins.
++      or on terminal line names, X <varname>$DISPLAY</varname> values,
++      or PAM service names in case of non-networked logins.
+     </para>
+     <para>
+       By default rules for access management are taken from config file
+       <filename>/etc/security/access.conf</filename> if you don't specify
+       another file.
++      Then individual <filename>*.conf</filename> files from the
++      <filename>/etc/security/access.d/</filename> directory are read.
++      The files are parsed one after another in the order of the system locale.
++      The effect of the individual files is the same as if all the files were
++      concatenated together in the order of parsing. This means that once
++      a pattern is matched in some file no further files are parsed.
++      If a config file is explicitly specified with the <option>accessfile</option>
++      option the files in the above directory are not parsed.
+     </para>
+     <para>
+       If Linux PAM is compiled with audit support the module will report
+-      when it denies access based on origin (host or tty).
++      when it denies access based on origin (host, tty, etc.).
+     </para>
+   </refsect1>
+ 

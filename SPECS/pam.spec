@@ -3,7 +3,7 @@
 Summary: An extensible library which provides authentication for applications
 Name: pam
 Version: 1.1.8
-Release: 18%{?dist}
+Release: 22%{?dist}
 # The library is BSD licensed with option to relicense as GPLv2+
 # - this option is redundant as the BSD license allows that anyway.
 # pam_timestamp, pam_loginuid, and pam_console modules are GPLv2+.
@@ -64,6 +64,11 @@ Patch49: pam-1.1.8-relax-audit.patch
 Patch50: pam-1.1.8-lastlog-localtime.patch
 Patch51: pam-1.1.8-man-delay.patch
 Patch52: pam-1.1.8-succeed-if-large-uid.patch
+Patch53: pam-1.1.8-access-update.patch
+Patch54: pam-1.1.8-man-space.patch
+Patch55: pam-1.1.8-tty-audit-uid-range.patch
+Patch56: pam-1.1.8-faillock-admin-group.patch
+Patch57: pam-1.1.8-mkhomedir-inroot.patch
 
 %define _pamlibdir %{_libdir}
 %define _moduledir %{_libdir}/security
@@ -161,6 +166,11 @@ mv pam-redhat-%{pam_redhat_version}/* modules
 %patch50 -p1 -b .localtime
 %patch51 -p1 -b .delay
 %patch52 -p1 -b .large-uid
+%patch53 -p1 -b .access-update
+%patch54 -p1 -b .space
+%patch55 -p1 -b .uid-range
+%patch56 -p1 -b .admin-group
+%patch57 -p1 -b .mkhomedir-inroot
 
 %build
 autoreconf -i
@@ -409,6 +419,23 @@ fi
 %doc doc/adg/*.txt doc/adg/html
 
 %changelog
+* Fri Nov  3 2017 Tomáš Mráz <tmraz@redhat.com> 1.1.8-22
+- pam_mkhomedir: do not fail creating parent dir if in /
+
+* Thu Nov  2 2017 Tomáš Mráz <tmraz@redhat.com> 1.1.8-21
+- pam(8) Manual page missing space fix (#1382302)
+
+* Mon Oct  9 2017 Tomáš Mráz <tmraz@redhat.com> 1.1.8-20
+- pam_tty_audit: add support for uid range matching
+
+* Fri Sep  8 2017 Tomáš Mráz <tmraz@redhat.com> 1.1.8-19
+- pam_access: (group) match syntax is prioritized over network@netgroup
+  match (#1358881), add support for additional /etc/security/access.d/*.conf
+  files, improve documentation (#1421735)
+- pam_lastlog: fix pt_BR translation (#1185697)
+- pam_faillock: support admin_group with users equivalent to root in
+  faillock handling (#1285550)
+
 * Tue Jul 19 2016 Tomáš Mráz <tmraz@redhat.com> 1.1.8-18
 - pam_succeed_if: fix handling of large uids, tty, and rhost
 

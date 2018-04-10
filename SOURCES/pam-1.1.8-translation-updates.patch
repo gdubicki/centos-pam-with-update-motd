@@ -762,10 +762,10 @@ diff -urN a/Linux-PAM-1.1.8/po/bn_IN.po b/Linux-PAM-1.1.8/po/bn_IN.po
 -
 -#~ msgid "Would you like to enter a security context? [N] "
 -#~ msgstr "নিরাপত্তা সংক্রান্ত context উল্লেখ করতে ইচ্ছুক কি? [N] "
-diff -urN a/Linux-PAM-1.1.8/po/pt_BR.po b/Linux-PAM-1.1.8/po/pt_BR.po
---- a/Linux-PAM-1.1.8/po/pt_BR.po	2013-11-28 17:24:14.193596625 +0530
-+++ b/Linux-PAM-1.1.8/po/pt_BR.po	2013-11-28 17:27:02.137118305 +0530
-@@ -1,315 +1,335 @@
+diff -up a/Linux-PAM-1.1.8/po/pt_BR.po.translations b/Linux-PAM-1.1.8/po/pt_BR.po
+--- a/Linux-PAM-1.1.8/po/pt_BR.po.translations	2013-09-19 10:02:24.000000000 +0200
++++ b/Linux-PAM-1.1.8/po/pt_BR.po	2017-09-08 14:14:24.857295156 +0200
+@@ -1,516 +1,546 @@
  # SOME DESCRIPTIVE TITLE.
  # Copyright (C) YEAR Linux-PAM Project
  # This file is distributed under the same license as the PACKAGE package.
@@ -1181,15 +1181,18 @@ diff -urN a/Linux-PAM-1.1.8/po/pt_BR.po b/Linux-PAM-1.1.8/po/pt_BR.po
  #, c-format
  msgid "There was %d failed login attempt since the last successful login."
  msgid_plural ""
-@@ -318,199 +338,209 @@
- msgstr[1] "Houveram %d falhas de login desde o último login bem sucedido."
+ "There were %d failed login attempts since the last successful login."
+ msgstr[0] "Houve %d falhas de login desde o último login bem sucedido."
+-msgstr[1] "Houveram %d falhas de login desde o último login bem sucedido."
++msgstr[1] "Houve %d falhas de login desde o último login bem sucedido."
  
  #. TRANSLATORS: only used if dngettext is not supported
 -#: modules/pam_lastlog/pam_lastlog.c:548
 +#: .././modules/pam_lastlog/pam_lastlog.c:548
  #, c-format
  msgid "There were %d failed login attempts since the last successful login."
- msgstr "Houveram %d falhas de login desde o último login bem sucedido."
+-msgstr "Houveram %d falhas de login desde o último login bem sucedido."
++msgstr "Houve %d falhas de login desde o último login bem sucedido."
  
 -#: modules/pam_limits/pam_limits.c:1079
 +#: .././modules/pam_limits/pam_limits.c:1079
