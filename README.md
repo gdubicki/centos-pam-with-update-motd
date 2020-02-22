@@ -40,16 +40,24 @@ Test it by SSHing to your machine.
 
 ## Development
 
-### Creating the build environment
+### Prerequisites
 
-This step is **optional** as we have pushed `gdubicki/centos-pam-with-update-motd` Docker image to Dockerhub,
+* Docker
+
+### 1. Clone this repo
+
+Obviously.
+
+### 2. Creating the build environment
+
+This step is **optional** as I have pushed `gdubicki/centos-pam-with-update-motd` Docker image to Dockerhub,
 so you can just pull it in the next step.
  
 ```
 docker build --tag gdubicki/centos-pam-with-update-motd .
 ```
 
-### Building the PAM RPM
+### 3. Building the PAM RPM
 
 ```
 docker run -it -v $(pwd)/update-motd/pam.spec:/root/rpmbuild/SPECS/pam.spec -v $(pwd)/update-motd/pam-1.1.8-update-motd.patch:/root/rpmbuild/SOURCES/pam-1.1.8-update-motd.patch gdubicki/centos-pam-with-update-motd:latest rpmbuild --define "_topdir /root/rpmbuild" -bb /root/rpmbuild/SPECS/pam.spec
