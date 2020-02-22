@@ -1,6 +1,5 @@
-SOURCES/Linux-PAM-1.1.8.tar.bz2
-SOURCES/pam-redhat-0.99.11.tar.bz2
-BUILD/
-BUILDROOT/
-RPMS/*
-SRPMS/
+*/pam/
+*/rpmbuild/
+*/debianutils/
+/debian-run-parts-for-centos/bin/run-parts*
+/update-motd/bin/run-parts*

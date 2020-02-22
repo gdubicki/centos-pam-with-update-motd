@@ -13,7 +13,7 @@ Source0: http://www.linux-pam.org/library/Linux-PAM-%{version}.tar.bz2
 # This is the old location that might be revived in future:
 #Source0: http://ftp.us.kernel.org/pub/linux/libs/pam/library/Linux-PAM-%{version}.tar.bz2
 #Source1: http://ftp.us.kernel.org/pub/linux/libs/pam/library/Linux-PAM-%{version}.tar.bz2.sign
-Source2: https://fedorahosted.org/releases/p/a/pam-redhat/pam-redhat-%{pam_redhat_version}.tar.bz2
+Source2: https://src.fedoraproject.org/repo/pkgs/pam/pam-redhat-%{pam_redhat_version}.tar.bz2/29eab110f57e8d60471081a6278a5a92/pam-redhat-%{pam_redhat_version}.tar.bz2
 Source5: other.pamd
 Source6: system-auth.pamd
 Source7: password-auth.pamd
@@ -27,6 +27,7 @@ Source14: 20-nproc.conf
 Source15: pamtmp.conf
 Source16: postlogin.pamd
 Source17: postlogin.5
+Source18: run-parts-debian
 Patch1:  pam-1.0.90-redhat-modules.patch
 Patch2:  pam-1.1.6-std-noclose.patch
 Patch4:  pam-1.1.0-console-nochmod.patch
@@ -105,7 +106,6 @@ BuildRequires: libdb-devel
 # Following deps are necessary only to build the pam library documentation.
 BuildRequires: linuxdoc-tools, elinks, libxslt
 BuildRequires: docbook-style-xsl, docbook-dtds
-Requires: crontabs
 
 URL: http://www.linux-pam.org/
 
@@ -262,6 +262,10 @@ rm -fr $RPM_BUILD_ROOT/usr/share/doc/pam
 # Install the file for autocreation of /var/run subdirectories on boot
 install -m644 -D %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/pam.conf
 
+# Install the Debian-version of run-parts under a different name
+# than the Centos one from crontabs package
+install -m755 -D %{SOURCE17} $RPM_BUILD_ROOT/%{_bindir}/run-parts-debian
+
 %find_lang Linux-PAM
 
 %check
@@ -412,6 +416,7 @@ fi
 %{_prefix}/lib/tmpfiles.d/pam.conf
 %{_mandir}/man5/*
 %{_mandir}/man8/*
+%{_bindir}/run-parts-debian
 
 %files devel
 %defattr(-,root,root)
