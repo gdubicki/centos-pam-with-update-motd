@@ -105,6 +105,7 @@ BuildRequires: libdb-devel
 # Following deps are necessary only to build the pam library documentation.
 BuildRequires: linuxdoc-tools, elinks, libxslt
 BuildRequires: docbook-style-xsl, docbook-dtds
+Requires: crontabs
 
 URL: http://www.linux-pam.org/
 
