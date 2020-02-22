@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+	"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+
+<refentry id="pam_motd">
+
+  <refmeta>
+    <refentrytitle>pam_motd</refentrytitle>
+    <manvolnum>8</manvolnum>
+    <refmiscinfo class="sectdesc">Linux-PAM Manual</refmiscinfo>
+  </refmeta>
+
+  <refnamediv id="pam_motd-name">
+    <refname>pam_motd</refname>
+    <refpurpose>Display the motd file</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis id="pam_motd-cmdsynopsis">
+      <command>pam_motd.so</command>
+      <arg choice="opt">
+        motd=<replaceable>/path/filename</replaceable>
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1 id="pam_motd-description">
+
+    <title>DESCRIPTION</title>
+
+    <para>
+      pam_motd is a PAM module that can be used to display
+      arbitrary motd (message of the day) files after a successful
+      login. By default the <filename>/etc/motd</filename> file is
+      shown. The message size is limited to 64KB.
+    </para>
+
+  </refsect1>
+
+  <refsect1 id="pam_motd-options">
+
+    <title>OPTIONS</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <option>motd=<replaceable>/path/filename</replaceable></option>
+        </term>
+        <listitem>
+          <para>
+	    The <filename>/path/filename</filename> file is displayed
+            as message of the day.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>motd_dir=<replaceable>/path/dirname.d</replaceable></option>
+        </term>
+        <listitem>
+          <para>
+            The <filename>/path/dirname.d</filename> directory is scanned
+            and each file contained inside of it is displayed.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <para>
+      When no options are given, the default is to display both
+      <filename>/etc/motd</filename> and the contents of
+      <filename>/etc/motd.d</filename>.  Specifying either option (or both)
+      will disable this default behavior.
+    </para>
+  </refsect1>
+
+  <refsect1 id="pam_motd-types">
+    <title>MODULE TYPES PROVIDED</title>
+    <para>
+      Only the <option>session</option> module type is provided.
+    </para>
+  </refsect1>
+
+  <refsect1 id='pam_motd-return_values'>
+    <title>RETURN VALUES</title>
+    <variablelist>
+      <varlistentry>
+        <term>PAM_IGNORE</term>
+        <listitem>
+          <para>
+            This is the only return value of this module.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+     </refsect1>
+
+  <refsect1 id='pam_motd-examples'>
+    <title>EXAMPLES</title>
+    <para>
+      The suggested usage for <filename>/etc/pam.d/login</filename> is:
+      <programlisting>
+session  optional  pam_motd.so
+      </programlisting>
+    </para>
+    <para>
+      To use a <filename>motd</filename> file from a different location:
+      <programlisting>
+session  optional  pam_motd.so motd=/elsewhere/motd
+      </programlisting>
+    </para>
+    <para>
+      To use a <filename>motd</filename> file from elsewhere, along with a
+      corresponding <filename>.d</filename> directory:
+      <programlisting>
+session  optional  pam_motd.so motd=/elsewhere/motd motd_dir=/elsewhere/motd.d
+      </programlisting>
+    </para>
+  </refsect1>
+
+  <refsect1 id='pam_motd-see_also'>
+    <title>SEE ALSO</title>
+    <para>
+      <citerefentry>
+	<refentrytitle>motd</refentrytitle><manvolnum>5</manvolnum>
+      </citerefentry>,
+      <citerefentry>
+	<refentrytitle>pam.conf</refentrytitle><manvolnum>5</manvolnum>
+      </citerefentry>,
+      <citerefentry>
+	<refentrytitle>pam.d</refentrytitle><manvolnum>5</manvolnum>
+      </citerefentry>,
+      <citerefentry>
+	<refentrytitle>pam</refentrytitle><manvolnum>8</manvolnum>
+      </citerefentry>
+    </para>
+  </refsect1>
+
+  <refsect1 id='pam_motd-author'>
+    <title>AUTHOR</title>
+      <para>
+        pam_motd was written by Ben Collins &lt;bcollins@debian.org&gt;.
+      </para>
+      <para>
+        The <option>motd_dir=</option> option was added by
+        Allison Karlitskaya &lt;allison.karlitskaya@redhat.com&gt;.
+      </para>
+  </refsect1>
+
+</refentry>
