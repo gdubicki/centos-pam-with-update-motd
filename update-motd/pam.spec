@@ -264,7 +264,7 @@ install -m644 -D %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/pam.conf
 
 # Install the Debian-version of run-parts under a different name
 # than the Centos one from crontabs package
-install -m755 -D %{SOURCE17} $RPM_BUILD_ROOT/%{_bindir}/run-parts-debian
+install -m755 -D %{SOURCE18} $RPM_BUILD_ROOT/%{_bindir}/run-parts-debian
 
 %find_lang Linux-PAM
 

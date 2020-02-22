@@ -4,29 +4,12 @@
 
 ## Status️
 
-Working! ...almost, see the first TODO below.
-
-## TODO
-
-1. We need to replace `run-parts` script from `crontabs` package with our own
-as that one prints the scripts' names before their output, like this:
-
-```
-gdubicki@mac ~ $ ssh foo-server
-/etc/update-motd.d/10_hello_world:
-
-Hello World
-```
-
-2. Get the latest PAM release from Centos git instead of keeping a copy here.
-
-3. Add a build pipeline running in GitHub (Travis? Circle CI? Note to self: building in DockerHub
-seems to not work, avoid.)
+Working!
 
 ## Installing
 
 ```
-yum install https://github.com/gdubicki/centos-pam-with-update-motd/releases/download/1.1.8-1022.1/pam-1.1.8-1022.el7.x86_64.rpm
+yum install https://github.com/gdubicki/centos-pam-with-update-motd/releases/download/1.1.8-1022.3/pam-1.1.8-1022.el7.x86_64.rpm
 ```
 
 ## Using
@@ -37,6 +20,13 @@ yum install https://github.com/gdubicki/centos-pam-with-update-motd/releases/dow
 4. Add some scripts to generate your dynamic MOTD in `/etc/update-motd.d`.
 
 Test it by SSHing to your machine.
+
+## TODO
+
+(1. & 2. that were here are done)
+
+3. Add a build pipeline running in GitHub (Travis? Circle CI? Note to self: building in DockerHub
+seems to not work, avoid.)
 
 ## Development
 
