@@ -6,11 +6,16 @@
 
 It works! 🎉
 
-## Installing
+## Installing from binary
+
+If you trust me then do the following:
 
 ```
 yum install https://github.com/gdubicki/centos-pam-with-update-motd/releases/download/1.1.8-1022.3/pam-1.1.8-1022.el7.x86_64.rpm
 ```
+
+If not, then no hard feelings - PAM is a pretty critical part of GNU/Linux so it is wise to be careful.
+Please skip to the [Building your own binary](#building-your-own-binary) below for info how to build your own binary.
 
 ## Using
 
@@ -21,14 +26,23 @@ yum install https://github.com/gdubicki/centos-pam-with-update-motd/releases/dow
 
 Test it by SSHing to your machine.
 
-## TODO
+## Troubleshooting
 
-(Points 1. & 2. that were here are done!)
+Try to run the same command as PAM is to generate your dynamic MOTD: `run-parts-debian --lsbsysinit /etc/update-motd.d`
+and check if it shows any output.
 
-3. Add a build pipeline running in GitHub (Travis? Circle CI? Note to self: building in DockerHub
-seems to not work, avoid.)
+If yes then please open an issue in this repo, I will try (but not promise) to help.
 
-## Development
+If not then please check your scripts in `/etc/update-motd.d` for:
+* permissions - they should be at least readable and executable by root (`0500`),
+* file names - they have to have LSB init-compatible names, good: `10hello`, bad: `10_hello` (!),
+
+If above conditions are not met then **they will fail to run without a warning**! Yeah, it's a pain but that's how it
+works in Ubuntu too and we are using the same code for compatibility...
+
+## Building your own binary
+
+If you want to build the RPMs using code in this repo on your machine then please do the following:
 
 ### Prerequisites
 
@@ -112,6 +126,13 @@ gdubicki/centos-pam-with-update-motd:latest \
 ```
 
 Created RPMs will be places in the `RPMS` directory.
+
+## TODO
+
+(Points 1. & 2. that were here are done!)
+
+3. Add a build pipeline running in GitHub (Travis? Circle CI? Note to self: building in DockerHub
+seems to not work, avoid.)
 
 ## License
 
