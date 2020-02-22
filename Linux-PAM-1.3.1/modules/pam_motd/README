@@ -1,0 +1,49 @@
+pam_motd — Display the motd file
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DESCRIPTION
+
+pam_motd is a PAM module that can be used to display arbitrary motd (message of
+the day) files after a successful login. By default the /etc/motd file is
+shown. The message size is limited to 64KB.
+
+OPTIONS
+
+motd=/path/filename
+
+    The /path/filename file is displayed as message of the day.
+
+motd_dir=/path/dirname.d
+
+    The /path/dirname.d directory is scanned and each file contained inside of
+    it is displayed.
+
+When no options are given, the default is to display both /etc/motd and the
+contents of /etc/motd.d. Specifying either option (or both) will disable this
+default behavior.
+
+EXAMPLES
+
+The suggested usage for /etc/pam.d/login is:
+
+session  optional  pam_motd.so
+
+
+To use a motd file from a different location:
+
+session  optional  pam_motd.so motd=/elsewhere/motd
+
+
+To use a motd file from elsewhere, along with a corresponding .d directory:
+
+session  optional  pam_motd.so motd=/elsewhere/motd motd_dir=/elsewhere/motd.d
+
+
+AUTHOR
+
+pam_motd was written by Ben Collins <bcollins@debian.org>.
+
+The motd_dir= option was added by Allison Karlitskaya
+<allison.karlitskaya@redhat.com>.
+
