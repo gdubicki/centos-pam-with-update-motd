@@ -11,13 +11,11 @@ RUN yum clean metadata \
     rpm-build \
     rpmdevtools
 
-# add PAM sources
+# add PAM original sources
 RUN mkdir /root/rpmbuild
-COPY . /root/rpmbuild/
+COPY SOURCES /root/rpmbuild/SOURCES
+COPY SPECS /root/rpmbuild/SPECS
 
 # install build dependencies specific to PAM
 RUN spectool --get-files -C /root/rpmbuild/SOURCES/ /root/rpmbuild/SPECS/pam.spec
 RUN yum-builddep -y /root/rpmbuild/SPECS/pam.spec
-
-# build PAM
-ENTRYPOINT rpmbuild --define "_topdir /root/rpmbuild" -bb /root/rpmbuild/SPECS/pam.spec
