@@ -1,6 +1,10 @@
-# Centos 7 PAM with dynamic MOTD support (update-motd from Ubuntu)
+# RPM with PAM for Centos 7 with a port of update-motd from Ubuntu
 
-☝
+This repo contains the code for ☝️. And the RPM itself is under [releases](https://github.com/gdubicki/centos-pam-with-update-motd/releases).
+
+You may want to read my article about this solution ["Dynamic MOTD on Centos 7, like on Ubuntu"](https://medium.com/@GregDubicki/dynamic-motd-on-centos-7-like-on-ubuntu-60d66e1b806d).
+
+Or you may just go straight to using this. :)
 
 ## Status️
 
