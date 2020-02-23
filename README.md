@@ -2,9 +2,9 @@
 
 This repo contains the code for ☝️. And the RPM itself is under [releases](https://github.com/gdubicki/centos-pam-with-update-motd/releases).
 
-You may want to read my article about this solution ["Dynamic MOTD on Centos 7, like on Ubuntu"](https://medium.com/@GregDubicki/dynamic-motd-on-centos-7-like-on-ubuntu-60d66e1b806d).
+You may want to read my article about this solution first: ["Dynamic MOTD on Centos 7, like on Ubuntu"](https://medium.com/@GregDubicki/dynamic-motd-on-centos-7-like-on-ubuntu-60d66e1b806d).
 
-Or you may just go straight to using this. :)
+Or you may just scroll down and start using this. :)
 
 ## Status️
 
