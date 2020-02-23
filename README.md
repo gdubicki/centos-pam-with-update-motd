@@ -144,8 +144,7 @@ run-parts as a part of debianutils package is distributed under [GPL v2](./COPYI
 
 PAM license is attached in the [pam.LICENSE](./pam.LICENSE) file. 
 
-update-motd patch has been written by Dustin Kirkland <kirkland@canonical.com>, probably under [GPL v2](./COPYING).
-Downloaded from: https://git.launchpad.net/ubuntu/+source/pam/tree/debian/patches-applied/update-motd
+update-motd patch has been written at [Canonical](https://canonical.com/) by [Dustin Kirkland](https://github.com/dustinkirkland), probably under [GPL v2](./COPYING). The patch has been downloaded from here: https://git.launchpad.net/ubuntu/+source/pam/tree/debian/patches-applied/update-motd
 
 Centos PAM package is also licensed under [GPL v2](./COPYING).
 
