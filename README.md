@@ -23,8 +23,9 @@ Please skip to the [Building your own binary](#building-your-own-binary) below f
 
 ## Using
 
-1. Delete the default `/etc/motd`.
-2. Optionally add/change `PrintLastLog no` in your `/etc/ssh/sshd_config`, reload `sshd` service.
+1. Delete the default static `/etc/motd`.
+2. Make SSHD not show the static MOTD with lines `PrintMotd   no`, `Banner      none`, `UsePAM      yes`
+ (and optionally `PrintLastLog no`) in your `/etc/ssh/sshd_config` & reload `sshd` service.
 3. Add this line to your `/etc/pam.d/sshd`: `session    optional     pam_motd.so motd=/run/motd.dynamic`.
 4. Add some scripts to generate your dynamic MOTD in `/etc/update-motd.d`.
 
