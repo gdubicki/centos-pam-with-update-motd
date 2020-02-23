@@ -99,7 +99,7 @@ In this case `c7` is the branch of Centos 7:
 git clone --single-branch --branch c7 https://git.centos.org/rpms/pam.git 
 ```
 
-### 6. Build the build environment
+### 6. Build the PAM build environment
 
 This step is **optional** as I have pushed `gdubicki/centos-pam-with-update-motd` Docker image to Dockerhub,
 so you can just pull it in the next step.
