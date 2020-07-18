@@ -13,7 +13,7 @@ Source0: http://www.linux-pam.org/library/Linux-PAM-%{version}.tar.bz2
 # This is the old location that might be revived in future:
 #Source0: http://ftp.us.kernel.org/pub/linux/libs/pam/library/Linux-PAM-%{version}.tar.bz2
 #Source1: http://ftp.us.kernel.org/pub/linux/libs/pam/library/Linux-PAM-%{version}.tar.bz2.sign
-Source2: https://fedorahosted.org/releases/p/a/pam-redhat/pam-redhat-%{pam_redhat_version}.tar.bz2
+Source2: https://src.fedoraproject.org/repo/pkgs/pam/pam-redhat-%{pam_redhat_version}.tar.bz2/29eab110f57e8d60471081a6278a5a92/pam-redhat-%{pam_redhat_version}.tar.bz2
 Source5: other.pamd
 Source6: system-auth.pamd
 Source7: password-auth.pamd
