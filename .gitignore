@@ -4,3 +4,4 @@
 /debian-run-parts-for-centos/bin/run-parts*
 /update-motd/bin/run-parts*
 /update-motd/rpmbuild/RPMS/x86_64/
+**/.vagrant/
