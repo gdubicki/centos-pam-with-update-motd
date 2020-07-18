@@ -15,7 +15,7 @@ It works! 🎉
 If you trust me then do the following:
 
 ```
-yum install https://github.com/gdubicki/centos-pam-with-update-motd/releases/download/1.1.8-1022.3/pam-1.1.8-1022.el7.x86_64.rpm
+yum install https://github.com/gdubicki/centos-pam-with-update-motd/releases/download/1.1.8-1023.1/pam-1.1.8-1023.el7.x86_64.rpm
 ```
 
 If not, then no hard feelings - PAM is a pretty critical part of GNU/Linux so it is wise to be careful.
