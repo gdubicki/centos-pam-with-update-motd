@@ -8,7 +8,8 @@ Or you may just scroll down and start using this. :)
 
 ## Status️
 
-It works! 🎉
+It works! 🎉 ...but only with SELinux disabled or permissive. :/
+See [#2](https://github.com/gdubicki/centos-pam-with-update-motd/issues/2) for more info.
 
 ## Installing from binary
 
@@ -28,6 +29,7 @@ Please skip to the [Building your own binary](#building-your-own-binary) below f
  (and optionally `PrintLastLog no`) in your `/etc/ssh/sshd_config` & reload `sshd` service.
 3. Add this line to your `/etc/pam.d/sshd`: `session    optional     pam_motd.so motd=/run/motd.dynamic`.
 4. Add some scripts to generate your dynamic MOTD in `/etc/update-motd.d`.
+5. Set SELinux to disabled or permissive. (See [#2](https://github.com/gdubicki/centos-pam-with-update-motd/issues/2) for more info.)
 
 Test it by SSHing to your machine.
 
