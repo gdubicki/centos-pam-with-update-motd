@@ -3,7 +3,7 @@
 Summary: An extensible library which provides authentication for applications
 Name: pam
 Version: 1.1.8
-Release: 1022%{?dist}
+Release: 1023%{?dist}
 # The library is BSD licensed with option to relicense as GPLv2+
 # - this option is redundant as the BSD license allows that anyway.
 # pam_timestamp, pam_loginuid, and pam_console modules are GPLv2+.
@@ -13,7 +13,7 @@ Source0: http://www.linux-pam.org/library/Linux-PAM-%{version}.tar.bz2
 # This is the old location that might be revived in future:
 #Source0: http://ftp.us.kernel.org/pub/linux/libs/pam/library/Linux-PAM-%{version}.tar.bz2
 #Source1: http://ftp.us.kernel.org/pub/linux/libs/pam/library/Linux-PAM-%{version}.tar.bz2.sign
-Source2: https://src.fedoraproject.org/repo/pkgs/pam/pam-redhat-%{pam_redhat_version}.tar.bz2/29eab110f57e8d60471081a6278a5a92/pam-redhat-%{pam_redhat_version}.tar.bz2
+Source2: https://fedorahosted.org/releases/p/a/pam-redhat/pam-redhat-%{pam_redhat_version}.tar.bz2
 Source5: other.pamd
 Source6: system-auth.pamd
 Source7: password-auth.pamd
@@ -70,7 +70,11 @@ Patch54: pam-1.1.8-man-space.patch
 Patch55: pam-1.1.8-tty-audit-uid-range.patch
 Patch56: pam-1.1.8-faillock-admin-group.patch
 Patch57: pam-1.1.8-mkhomedir-inroot.patch
-Patch58: pam-1.1.8-update-motd.patch
+Patch58: pam-1.1.8-authtok-verified.patch
+Patch59: pam-1.1.8-man-fixes.patch
+Patch60: pam-1.1.8-unix-max-fd-no.patch
+Patch61: pam-1.1.8-loginuid-containers.patch
+Patch62: pam-1.1.8-update-motd.patch
 
 %define _pamlibdir %{_libdir}
 %define _moduledir %{_libdir}/security
@@ -113,7 +117,7 @@ URL: http://www.linux-pam.org/
 PAM (Pluggable Authentication Modules) is a system security tool that
 allows system administrators to set authentication policy without
 having to recompile programs that handle authentication.
-* This release is based on original release 22 and additionally
+* This release is based on original release 23 and additionally
 contains Ubuntu's update-motd patch. *
 
 %package devel
@@ -175,7 +179,11 @@ mv pam-redhat-%{pam_redhat_version}/* modules
 %patch55 -p1 -b .uid-range
 %patch56 -p1 -b .admin-group
 %patch57 -p1 -b .mkhomedir-inroot
-%patch58 -p1 -b .update-motd
+%patch58 -p1 -b .authtok-verified
+%patch59 -p1 -b .manfix
+%patch60 -p1 -b .max-fd-no
+%patch61 -p1 -b .containers
+%patch62 -p1 -b .update-motd
 
 %build
 autoreconf -i
@@ -265,6 +273,9 @@ install -m644 -D %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/pam.conf
 # Install the Debian-version of run-parts under a different name
 # than the Centos one from crontabs package
 install -m755 -D %{SOURCE18} $RPM_BUILD_ROOT/%{_bindir}/run-parts-debian
+
+# Create the update-motd.d dir
+install -d -m 755 %{_sysconfdir}/update-motd.d
 
 %find_lang Linux-PAM
 
@@ -417,6 +428,7 @@ fi
 %{_mandir}/man5/*
 %{_mandir}/man8/*
 %{_bindir}/run-parts-debian
+%dir %{_sysconfdir}/update-motd.d
 
 %files devel
 %defattr(-,root,root)
@@ -429,6 +441,13 @@ fi
 %doc doc/adg/*.txt doc/adg/html
 
 %changelog
+* Tue Aug  6 2019 Tomáš Mráz <tmraz@redhat.com> 1.1.8-23
+- pam_get_authtok_verify: ensure no double verification happens
+- manual page fixes for pam_tty_audit and pam_wheel
+- pam_unix: lower the excessive maximum number of closed fd descriptors
+  when spawning handlers
+- pam_loginuid: do not prevent login in unprivileged containers
+
 * Fri Nov  3 2017 Tomáš Mráz <tmraz@redhat.com> 1.1.8-22
 - pam_mkhomedir: do not fail creating parent dir if in /
 
