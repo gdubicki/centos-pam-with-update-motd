@@ -275,7 +275,7 @@ install -m644 -D %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/pam.conf
 install -m755 -D %{SOURCE18} $RPM_BUILD_ROOT/%{_bindir}/run-parts-debian
 
 # Create the update-motd.d dir
-mkdir %{_sysconfdir}/update-motd.d
+mkdir $RPM_BUILD_ROOT%{_sysconfdir}/update-motd.d
 
 %find_lang Linux-PAM
 
