@@ -65,7 +65,7 @@ cd debian-run-parts-for-centos/
 git clone --single-branch --branch ubuntu/xenial https://git.launchpad.net/ubuntu/+source/debianutils
 ```
 
-### 3. Build the run-parts' build environment
+### 3. Build the run-parts' build environment (OPTIONAL)
 
 This step is **optional** as I have pushed `gdubicki/debian-run-parts-for-centos` Docker image to Dockerhub,
 so you can just pull it in the next step.
@@ -100,7 +100,7 @@ In this case `c7` is the branch of Centos 7:
 git clone --single-branch --branch c7 https://git.centos.org/rpms/pam.git 
 ```
 
-### 6. Build the PAM build environment
+### 6. Build the PAM build environment (OPTIONAL)
 
 This step is **optional** as I have pushed `gdubicki/centos-pam-with-update-motd` Docker image to Dockerhub,
 so you can just pull it in the next step.
@@ -125,6 +125,7 @@ docker run -it \
 -v $(pwd)/bin/run-parts-debian:/root/rpmbuild/SOURCES/run-parts-debian \
 -v $(pwd)/pam.spec:/root/rpmbuild/SPECS/pam.spec \
 -v $(pwd)/pam-1.1.8-update-motd.patch:/root/rpmbuild/SOURCES/pam-1.1.8-update-motd.patch \
+-v $(pwd)/pam/SOURCES:/root/rpmbuild/SOURCES \
 -v $(pwd)/rpmbuild/RPMS:/root/rpmbuild/RPMS \
 gdubicki/centos-pam-with-update-motd:latest \
 /bin/bash -c "spectool --get-files -C /root/rpmbuild/SOURCES/ /root/rpmbuild/SPECS/pam.spec ; rpmbuild --define '_topdir /root/rpmbuild' -bb /root/rpmbuild/SPECS/pam.spec"
