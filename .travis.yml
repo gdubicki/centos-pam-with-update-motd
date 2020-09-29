@@ -1,0 +1,19 @@
+language: generic
+
+services:
+  - docker
+
+before_install:
+  - docker pull gdubicki/centos-pam-with-update-motd
+  - cd update-motd/
+  - git clone --single-branch --branch c7 https://git.centos.org/rpms/pam.git
+
+script:
+  - docker run -it \
+    -v $(pwd)/bin/run-parts-debian:/root/rpmbuild/SOURCES/run-parts-debian \
+    -v $(pwd)/pam.spec:/root/rpmbuild/SPECS/pam.spec \
+    -v $(pwd)/pam-1.1.8-update-motd.patch:/root/rpmbuild/SOURCES/pam-1.1.8-update-motd.patch \
+    -v $(pwd)/pam/SOURCES:/root/rpmbuild/SOURCES \
+    -v $(pwd)/rpmbuild/RPMS:/root/rpmbuild/RPMS \
+    gdubicki/centos-pam-with-update-motd:latest \
+    /bin/bash -c "spectool --get-files -C /root/rpmbuild/SOURCES/ /root/rpmbuild/SPECS/pam.spec ; rpmbuild --define '_topdir /root/rpmbuild' -bb /root/rpmbuild/SPECS/pam.spec"

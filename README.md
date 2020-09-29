@@ -71,7 +71,7 @@ git clone --single-branch --branch ubuntu/xenial https://git.launchpad.net/ubunt
 
 This step is **optional** as I have pushed `gdubicki/debian-run-parts-for-centos` Docker image to Dockerhub,
 so you can just pull it in the next step.
- 
+
 ```
 # assuming that you still are in debian-run-parts-for-centos/ subdir
 docker build --tag gdubicki/debian-run-parts-for-centos .
