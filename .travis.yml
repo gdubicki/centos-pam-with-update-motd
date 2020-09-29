@@ -1,19 +1,29 @@
 language: generic
-
 services:
-  - docker
-
+- docker
 before_install:
-  - cd update-motd/
-  - git clone --single-branch --branch c7 https://git.centos.org/rpms/pam.git
-
+- cd update-motd/
+- git clone --single-branch --branch c7 https://git.centos.org/rpms/pam.git
 script:
-  - docker pull gdubicki/centos-pam-with-update-motd
-  - docker run -it
-    -v "$TRAVIS_BUILD_DIR/update-motd/bin/run-parts-debian:/root/rpmbuild/SOURCES/run-parts-debian"
-    -v "$TRAVIS_BUILD_DIR/update-motd/pam.spec:/root/rpmbuild/SPECS/pam.spec"
-    -v "$TRAVIS_BUILD_DIR/update-motd/pam-1.1.8-update-motd.patch:/root/rpmbuild/SOURCES/pam-1.1.8-update-motd.patch"
-    -v "$TRAVIS_BUILD_DIR/update-motd/pam/SOURCES:/root/rpmbuild/SOURCES"
-    -v "$TRAVIS_BUILD_DIR/update-motd/rpmbuild/RPMS:/root/rpmbuild/RPMS"
-    gdubicki/centos-pam-with-update-motd:latest
-    /bin/bash -c "spectool --get-files -C /root/rpmbuild/SOURCES/ /root/rpmbuild/SPECS/pam.spec ; rpmbuild --define '_topdir /root/rpmbuild' -bb /root/rpmbuild/SPECS/pam.spec"
+- docker pull gdubicki/centos-pam-with-update-motd
+- docker run -it -v "$TRAVIS_BUILD_DIR/update-motd/bin/run-parts-debian:/root/rpmbuild/SOURCES/run-parts-debian"
+  -v "$TRAVIS_BUILD_DIR/update-motd/pam.spec:/root/rpmbuild/SPECS/pam.spec" -v "$TRAVIS_BUILD_DIR/update-motd/pam-1.1.8-update-motd.patch:/root/rpmbuild/SOURCES/pam-1.1.8-update-motd.patch"
+  -v "$TRAVIS_BUILD_DIR/update-motd/pam/SOURCES:/root/rpmbuild/SOURCES" -v "$TRAVIS_BUILD_DIR/update-motd/rpmbuild/RPMS:/root/rpmbuild/RPMS"
+  gdubicki/centos-pam-with-update-motd:latest /bin/bash -c "spectool --get-files -C
+  /root/rpmbuild/SOURCES/ /root/rpmbuild/SPECS/pam.spec ; rpmbuild --define '_topdir
+  /root/rpmbuild' -bb /root/rpmbuild/SPECS/pam.spec"
+before_deploy:
+  - git config --local user.name "Greg Dubicki"
+  - git config --local user.email "grzegorz.dubicki@gmail.com"
+  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+  - git tag $TRAVIS_TAG
+deploy:
+  provider: releases
+  api_key:
+    secure: TN1t1dNxv6YZgeiSuIMUwsuYmyPet9eiVS5RV4VyPlXdmMhIJc/xoZT8p15wB5NE7/lsjV7htcvrFgzuK/c7HpaVIUEZQE+UdJLqtr84ZUlPHrVxeWFPpZ4WcmsahwAIeU0lgpdlLHvu5BblC+JZbhSbx7SKrDe1IkYoXbo3VQshhfRnmVjTYjt2+lFynvgRRzw/4QeTf/7o/3YRgXa3cgrIsQ338e4d/edpafrumwnvjc9abCxHVEdjEpfMXWD+hIux2gXgv3l6ROuFReK6dGAOtJbyikuxdfEhKVUPzInJTilCjMLlJ5WombJhmbN38KlYqsweDo1whKHEnecDZFv0e5FUIcP+45A39WBzxQ5z8TWdVFQYyrDp36KJEwfrCC+PERpQBk+XIkc2ybgQ41IdWACSAbiqKJN/o1ZUieNSaJOXvr9piE/YAXNGRfi25UrtoYK1gxP9I7Qfch2TcpHg1evClenWL5kZwCgxO/6w6oLXv7cYKunM3TwTTIc33YU45vesP2m89+OCatfnd9x+HLL+PSHmwcEWudlj/b/t3dIWrWELfx7ZslUbHDW1MLb0AlPuSXh20mmC095cMea9URPwpD9OooTchxYfvAstvKyFsLLcTAFdqQfj9yXxhmaVJEEwF8Jros/OEWocBKm+8weNfJjlEGYRCf+8EI0=
+  file_glob: true
+  file: update-motd/rpmbuild/RPMS/*.rpm
+  skip_cleanup: true
+  on:
+    repo: gdubicki/centos-pam-with-update-motd
+  draft: true
