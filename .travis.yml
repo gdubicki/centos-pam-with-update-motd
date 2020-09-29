@@ -9,11 +9,11 @@ before_install:
 
 script:
   - docker pull gdubicki/centos-pam-with-update-motd
-  - docker run -it \
-    -v "$TRAVIS_BUILD_DIR/update-motd/bin/run-parts-debian:/root/rpmbuild/SOURCES/run-parts-debian" \
-    -v "$TRAVIS_BUILD_DIR/update-motd/pam.spec:/root/rpmbuild/SPECS/pam.spec" \
-    -v "$TRAVIS_BUILD_DIR/update-motd/pam-1.1.8-update-motd.patch:/root/rpmbuild/SOURCES/pam-1.1.8-update-motd.patch" \
-    -v "$TRAVIS_BUILD_DIR/update-motd/pam/SOURCES:/root/rpmbuild/SOURCES" \
-    -v "$TRAVIS_BUILD_DIR/update-motd/rpmbuild/RPMS:/root/rpmbuild/RPMS" \
-    gdubicki/centos-pam-with-update-motd:latest \
+  - docker run -it
+    -v "$TRAVIS_BUILD_DIR/update-motd/bin/run-parts-debian:/root/rpmbuild/SOURCES/run-parts-debian"
+    -v "$TRAVIS_BUILD_DIR/update-motd/pam.spec:/root/rpmbuild/SPECS/pam.spec"
+    -v "$TRAVIS_BUILD_DIR/update-motd/pam-1.1.8-update-motd.patch:/root/rpmbuild/SOURCES/pam-1.1.8-update-motd.patch"
+    -v "$TRAVIS_BUILD_DIR/update-motd/pam/SOURCES:/root/rpmbuild/SOURCES"
+    -v "$TRAVIS_BUILD_DIR/update-motd/rpmbuild/RPMS:/root/rpmbuild/RPMS"
+    gdubicki/centos-pam-with-update-motd:latest
     /bin/bash -c "spectool --get-files -C /root/rpmbuild/SOURCES/ /root/rpmbuild/SPECS/pam.spec ; rpmbuild --define '_topdir /root/rpmbuild' -bb /root/rpmbuild/SPECS/pam.spec"
