@@ -51,6 +51,14 @@ works in Ubuntu too and we are using the same code for compatibility...
 
 If you want to build the RPMs using code in this repo on your machine then please do the following:
 
+### The easy way
+
+Please see [travis.yml](./.travis.yml) for commands which you can reproduce on your localhost or in your CI/CD system.
+
+### The hard way
+
+Below is a full how-to for building each component of this app. 
+ 
 ### Prerequisites
 
 * Docker
