@@ -17,7 +17,7 @@ deploy:
   api_key:
     secure: "lUQ+2eEb52t6NaxRmZMYytQG4lTjQFwpwNHTJ+Jh9StfyPPacUpP6L63ZyV/sOGM17ikjCnsEIUFVWTh72MLIV4oQ6fr6wkhm2jLVIydkuPYsUNbax7SYdKto4YkQ+vVEuruI6z7kyN96Tgce9zJO57s1uMdzAE4roilcUR7ftuke+hTf5T8ngA6q+pvUj6EZj8ioynhFlG81b8gp+GX4Pj6VcJfD6u6oTlSP8BymG3nTGhhjBWwPT5+5IGIJU9URszh5Wb9jTphd0C6cLw5pE6C+x+TtyarRt1LeztOkLxJujz+s0ydSBrhK4r3hPrdQfziFKRXfw0xAlteJVD/Kcws1oENge7MmcSCsqJbnkc5zO1VcZYbeZML7v/cShxGJ8mzECGHD8Y3D+a+VPsV5jHBpx655ZXNLoEdl8+JZ66+JPySU1c2cuQvQ2sD5R4n4avSN4f5hMtmTGU0Ehg0o9tE5Sk0dziNwQeR9hOmBbK9UvqHTgI9rWycRTFT1tLJXCv0eEqOKGxSJqHEX2W+PEVZTfQriO93eK/XccjX+PupphKgXLsiP/qJ4KxNbDDjmNI/145B2UlWWPwmQTDfsDINZjFWJUGIz51vsseO7XxI9La+puvCp57OryChuwOgqnJYVL9RGH5tkU5tEd2PT23r4zsU79aDEn7tGXQMwXY="
   file_glob: true
-  file: update-motd/rpmbuild/RPMS/*.rpm
+  file: rpmbuild/RPMS/*.rpm
   skip_cleanup: true
   on:
     repo: gdubicki/centos-pam-with-update-motd
