@@ -1,7 +1,9 @@
 */pam/
 */rpmbuild/
 */debianutils/
+*/util-linux/
 /debian-run-parts-for-centos/bin/run-parts*
+/script-without-header/bin/script*
 /update-motd/bin/run-parts*
 /update-motd/rpmbuild/RPMS/x86_64/
 **/.vagrant/

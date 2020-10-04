@@ -100,10 +100,10 @@ index ff9b169..17d3959 100644
 +    if (do_update && (stat("/etc/update-motd.d", &st_motd) == 0)
 +        && S_ISDIR(st_motd.st_mode))
 +    {
-+       mode_t old_mask = umask(0022);
-+       if (!system("/usr/bin/env -i PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin script -q -c 'run-parts-debian --lsbsysinit /etc/update-motd.d' /run/motd.dynamic.new > /dev/null"))
-+           rename("/run/motd.dynamic.new", "/run/motd.dynamic");
-+       umask(old_mask);
++       //mode_t old_mask = umask(0022);
++       system("/usr/bin/env -i PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin script-without-header -q -c 'run-parts-debian --lsbsysinit /etc/update-motd.d' /run/motd.dynamic > /dev/null");
++       //    rename("/run/motd.dynamic.new", "/run/motd.dynamic");
++       //umask(old_mask);
 +    }
 +
      while ((fd = open(motd_path, O_RDONLY, 0)) >= 0) {

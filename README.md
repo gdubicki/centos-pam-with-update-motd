@@ -95,9 +95,8 @@ Source: https://stackoverflow.com/a/33286344/2693875)
 # assuming that you still are in debian-run-parts-for-centos/ subdir
 docker run -it \
 -v $(pwd)/bin:/root/bin \
--v $(pwd)/Makefile.am:/root/debianutils/Makefile.am \
 gdubicki/debian-run-parts-for-centos:latest \
-/bin/bash -c "cd /root/debianutils ; autoreconf -f -i ; ./configure ; make ; cp run-parts /root/bin/"
+/bin/bash -c "cd /root/util-linux ; ./configure ; make ; cp script /root/bin/"
 ```
 
 Created binary file will be placed in `bin` subdirectory.
@@ -142,6 +141,10 @@ gdubicki/centos-pam-with-update-motd:latest \
 ```
 
 Created RPMs will be places in the `RPMS` directory.
+
+## TODO
+
+* Add building how-to step for building `script-without-header`
 
 ## License
 

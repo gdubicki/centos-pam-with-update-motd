@@ -3,7 +3,7 @@
 Summary: An extensible library which provides authentication for applications
 Name: pam
 Version: 1.1.8
-Release: 1023.2%{?dist}
+Release: 1023.3%{?dist}
 # The library is BSD licensed with option to relicense as GPLv2+
 # - this option is redundant as the BSD license allows that anyway.
 # pam_timestamp, pam_loginuid, and pam_console modules are GPLv2+.
@@ -28,6 +28,7 @@ Source15: pamtmp.conf
 Source16: postlogin.pamd
 Source17: postlogin.5
 Source18: run-parts-debian
+Source19: script-without-header
 Patch1:  pam-1.0.90-redhat-modules.patch
 Patch2:  pam-1.1.6-std-noclose.patch
 Patch4:  pam-1.1.0-console-nochmod.patch
@@ -274,6 +275,9 @@ install -m644 -D %{SOURCE15} $RPM_BUILD_ROOT%{_prefix}/lib/tmpfiles.d/pam.conf
 # than the Centos one from crontabs package
 install -m755 -D %{SOURCE18} $RPM_BUILD_ROOT/%{_bindir}/run-parts-debian
 
+# Install script program with the "Script started on" header removed
+install -m755 -D %{SOURCE19} $RPM_BUILD_ROOT/%{_bindir}/script-without-header
+
 # Create the update-motd.d dir
 mkdir $RPM_BUILD_ROOT%{_sysconfdir}/update-motd.d
 
@@ -428,6 +432,7 @@ fi
 %{_mandir}/man5/*
 %{_mandir}/man8/*
 %{_bindir}/run-parts-debian
+%{_bindir}/script-without-header
 %dir %{_sysconfdir}/update-motd.d
 
 %files devel

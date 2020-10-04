@@ -6,7 +6,9 @@ before_install:
 - git clone --single-branch --branch c7 https://git.centos.org/rpms/pam.git
 script:
 - docker pull gdubicki/centos-pam-with-update-motd
-- docker run -it -v "$TRAVIS_BUILD_DIR/update-motd/bin/run-parts-debian:/root/rpmbuild/SOURCES/run-parts-debian"
+- docker run -it
+  -v "$TRAVIS_BUILD_DIR/update-motd/bin/run-parts-debian:/root/rpmbuild/SOURCES/run-parts-debian"
+  -v "$TRAVIS_BUILD_DIR/update-motd/bin/script-without-header:/root/rpmbuild/SOURCES/script-without-header"
   -v "$TRAVIS_BUILD_DIR/update-motd/pam.spec:/root/rpmbuild/SPECS/pam.spec" -v "$TRAVIS_BUILD_DIR/update-motd/pam-1.1.8-update-motd.patch:/root/rpmbuild/SOURCES/pam-1.1.8-update-motd.patch"
   -v "$TRAVIS_BUILD_DIR/update-motd/pam/SOURCES:/root/rpmbuild/SOURCES" -v "$TRAVIS_BUILD_DIR/update-motd/rpmbuild/RPMS:/root/rpmbuild/RPMS"
   gdubicki/centos-pam-with-update-motd:latest /bin/bash -c "spectool --get-files -C
