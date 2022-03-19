@@ -6,7 +6,7 @@ You may want to read my article about this solution first: ["Dynamic MOTD on Cen
 
 Or you may just scroll down and start using this. :)
 
-## Status️
+## Status
 
 It works! 🎉 ...but only with SELinux disabled or permissive. :/
 See [#2](https://github.com/gdubicki/centos-pam-with-update-motd/issues/2) for more info.
@@ -19,17 +19,30 @@ If you trust me then do the following:
 yum install https://github.com/gdubicki/centos-pam-with-update-motd/releases/download/1.1.8-1023.1/pam-1.1.8-1023.el7.x86_64.rpm
 ```
 
-If not, then no hard feelings - PAM is a pretty critical part of GNU/Linux so it is wise to be careful.
+If not, then no hard feelings - PAM is a pretty critical part of GNU/Linux, so it is wise to be careful.
 Please skip to the [Building your own binary](#building-your-own-binary) below for info how to build your own binary.
 
 ## Using
 
 1. Delete the default static `/etc/motd`.
-2. Make SSHD not show the static MOTD with lines `PrintMotd   no`, `Banner      none`, `UsePAM      yes`
- (and optionally `PrintLastLog no`) in your `/etc/ssh/sshd_config` & reload `sshd` service.
-3. Add this line to your `/etc/pam.d/sshd`: `session    optional     pam_motd.so motd=/run/motd.dynamic`.
-4. Add some scripts to generate your dynamic MOTD in `/etc/update-motd.d`.
-5. Set SELinux to disabled or permissive. (See [#2](https://github.com/gdubicki/centos-pam-with-update-motd/issues/2) for more info.)
+2. Update SSHD config in `/etc/ssh/sshd_config`:
+```
+# this is required
+UsePAM yes
+
+# you most probably don't want to show the default, static MOTD
+PrintMotd no
+Banner none
+# you may also want to hide this for nicer output, although this is useful
+PrintLastLog no
+```
+... & reload `sshd` service.
+5. Add this line to your `/etc/pam.d/sshd`:
+```
+session    optional     pam_motd.so motd=/run/motd.dynamic
+```
+9. Add some scripts to generate your dynamic MOTD in `/etc/update-motd.d`.
+10. Set SELinux to disabled or permissive. (See [#2](https://github.com/gdubicki/centos-pam-with-update-motd/issues/2) for more info.)
 
 Test it by SSHing to your machine.
 
