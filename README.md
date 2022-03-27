@@ -1,3 +1,9 @@
+This solution is **DEPRECATED** because it's hacky, difficult to maintain and may be insecure - it requires you to disable SELinux. See [#2](https://github.com/gdubicki/centos-pam-with-update-motd/issues/2) for more info.
+
+To have a dynamic MOTD using [gdubicki/dynamotd](https://github.com/gdubicki/dynamotd) please see [its installation instructions](https://github.com/gdubicki/dynamotd#installation) using standard PAM package and a built-in `mod_exec` module.
+
+<br/><br/><br/>
+
 # RPM with PAM for Centos 7 with a port of update-motd from Ubuntu
 
 This repo contains the code for ☝️. And the RPM itself is under [releases](https://github.com/gdubicki/centos-pam-with-update-motd/releases).
@@ -5,11 +11,6 @@ This repo contains the code for ☝️. And the RPM itself is under [releases](h
 You may want to read my article about this solution first: ["Dynamic MOTD on Centos 7, like on Ubuntu"](https://medium.com/@GregDubicki/dynamic-motd-on-centos-7-like-on-ubuntu-60d66e1b806d).
 
 Or you may just scroll down and start using this. :)
-
-## Status
-
-It works! 🎉 ...but only with SELinux disabled or permissive. :/
-See [#2](https://github.com/gdubicki/centos-pam-with-update-motd/issues/2) for more info.
 
 ## Installing from binary
 
